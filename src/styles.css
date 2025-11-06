@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+:root {
+  --navbar-height: 4rem;
+}
