@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { CarouselSlide } from './models/CarouselSlide';
+import { CarouselSlide } from '../../models/CarouselSlide';
+
 
 @Component({
   selector: 'app-hero',
