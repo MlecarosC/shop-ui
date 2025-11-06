@@ -3,10 +3,11 @@ import { Hero } from './components/hero/hero';
 import { HomeProducts } from './components/homeProducts/homeProducts';
 import { HomeBlog } from './components/homeBlog/homeBlog';
 import { LogoCarousel } from './components/logoCarousel/logoCarousel';
+import { HomeAboutUs } from './components/homeAboutUs/homeAboutUs';
 
 @Component({
   selector: 'app-home',
-  imports: [Hero, HomeProducts, LogoCarousel, HomeBlog],
+  imports: [Hero, HomeProducts, LogoCarousel, HomeBlog, HomeAboutUs],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
