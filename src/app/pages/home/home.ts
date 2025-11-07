@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { Hero } from './components/hero/hero';
 import { HomeProducts } from './components/homeProducts/homeProducts';
 import { HomeBlog } from './components/homeBlog/homeBlog';
-import { LogoCarousel } from './components/logoCarousel/logoCarousel';
+import { LogoCarousel } from '../../shared/components/logoCarousel/logoCarousel';
 import { HomeAboutUs } from './components/homeAboutUs/homeAboutUs';
 
 @Component({

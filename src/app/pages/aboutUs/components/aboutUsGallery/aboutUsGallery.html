@@ -1,0 +1,29 @@
+<section class="w-full py-20 bg-base-100">
+  <div class="max-w-6xl mx-auto px-6 md:px-10">
+
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold mb-4">
+        Our Workspace
+      </h2>
+      <p class="text-lg text-base-content/70">
+        A glimpse into our creative environment
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (image of images(); track image.url) {
+        <div class="group relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer aspect-square">
+          <img 
+            [src]="image.url" 
+            [alt]="image.alt"
+            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+            <p class="text-white font-semibold p-4">{{ image.alt }}</p>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+</section>
