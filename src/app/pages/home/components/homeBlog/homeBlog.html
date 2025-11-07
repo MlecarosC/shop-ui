@@ -1,29 +1,32 @@
 <section class="w-full bg-base-100 py-12">
   <div class="max-w-6xl mx-auto px-6 md:px-10 flex flex-col md:flex-row gap-20">
     <div class="hidden md:flex gap-4">
-        <app-blog-card></app-blog-card>
-        <app-blog-card></app-blog-card>
-        <app-blog-card></app-blog-card>
+      @for (post of featuredPosts(); track post.id) {
+        <app-blog-card [post]="post"></app-blog-card>
+      }
     </div>
 
     <div class="md:w-1/3 flex flex-col justify-center items-start text-left">
       <h2 class="text-4xl font-bold">
-        Primera línea normal<br>
+        Latest from Our Blog
       </h2>
       <p class="mt-4 text-lg text-gray-600">
-        Esta es una pequeña descripción o subtítulo que acompaña al título principal.
+        Stay updated with our latest articles, insights, and industry trends.
       </p>
       <a 
         routerLink="/blog" 
         class="btn btn-primary btn-block mt-6">
-        Acción
+        Read More Articles
       </a>
     </div>
 
     <div class="flex md:hidden gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory">
-      <app-blog-card class="flex-shrink-0 w-full max-w-xs snap-start"></app-blog-card>
-      <app-blog-card class="flex-shrink-0 w-full max-w-xs snap-start"></app-blog-card>
-      <app-blog-card class="flex-shrink-0 w-full max-w-xs snap-start"></app-blog-card>
+      @for (post of featuredPosts(); track post.id) {
+        <app-blog-card 
+          [post]="post" 
+          class="flex-shrink-0 w-full max-w-xs snap-start">
+        </app-blog-card>
+      }
     </div>
   </div>
 </section>
