@@ -12,5 +12,5 @@ import { ProductService } from '../../../../shared/services/product.service';
 export class HomeProducts {
   private productService = inject(ProductService);
   
-  featuredProducts = signal(this.productService.getFeaturedProducts(3));
+  featuredProducts = signal(this.productService.getFeaturedProducts(2));
 }

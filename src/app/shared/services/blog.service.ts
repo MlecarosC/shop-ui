@@ -118,7 +118,7 @@ Cras mattis consectetur purus sit amet fermentum. Donec sed odio dui. Aenean lac
     return this.blogPosts().find(post => post.id === id) || null;
   }
 
-  getFeaturedPosts(limit: number = 3) {
+  getFeaturedPosts(limit: number = 2) {
     return this.blogPosts().slice(0, limit);
   }
 }

@@ -64,7 +64,7 @@ export class ProductService {
     return this.products().find(product => product.id === id) || null;
   }
 
-  getFeaturedProducts(limit: number = 3) {
+  getFeaturedProducts(limit: number = 2) {
     return this.products().slice(0, limit);
   }
 }

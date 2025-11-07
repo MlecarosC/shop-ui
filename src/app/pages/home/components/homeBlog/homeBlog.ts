@@ -12,5 +12,5 @@ import { BlogService } from '../../../../shared/services/blog.service';
 export class HomeBlog {
   private blogService = inject(BlogService);
   
-  featuredPosts = signal(this.blogService.getFeaturedPosts(3));
+  featuredPosts = signal(this.blogService.getFeaturedPosts(2));
 }
