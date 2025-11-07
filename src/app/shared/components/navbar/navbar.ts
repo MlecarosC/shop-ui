@@ -8,10 +8,24 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Navbar {
-    readonly menuItems = [
+  readonly menuItems = [
     { label: 'Home', route: '/home' },
     { label: 'Products', route: '/products' },
     { label: 'About Us', route: '/about-us' },
     { label: 'Blog', route: '/blog' },
   ];
+
+  closeMenuDrawer(): void {
+    const drawer = document.getElementById('menu-drawer') as HTMLInputElement;
+    if (drawer) {
+      drawer.checked = false;
+    }
+  }
+
+  closeCartDrawer(): void {
+    const drawer = document.getElementById('cart-drawer') as HTMLInputElement;
+    if (drawer) {
+      drawer.checked = false;
+    }
+  }
 }
