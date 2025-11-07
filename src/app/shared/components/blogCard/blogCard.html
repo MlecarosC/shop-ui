@@ -1,14 +1,46 @@
-<div class="card bg-base-100 w-full max-w-xs shadow-sm">
-  <figure>
+<div class="card bg-base-100 w-full max-w-xs shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
+  <figure class="h-48 overflow-hidden flex-shrink-0">
     <img
-      src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-      alt="Shoes" />
+      [src]="post()?.image ?? 'https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'"
+      [alt]="post()?.title ?? 'Blog post image'"
+      class="w-full h-full object-cover"
+    />
   </figure>
-  <div class="card-body">
-    <h2 class="card-title">Card Title</h2>
-    <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-    <div class="card-actions justify-end">
-      <button class="btn btn-primary btn-block">View More</button>
-    </div>
+  <div class="card-body flex-grow flex flex-col">
+    @if (post(); as blogPost) {
+      <!-- Fecha -->
+      <div class="text-xs text-base-content/60 mb-2">
+        {{ blogPost.date | date:'mediumDate' }}
+      </div>
+      
+      <!-- Título -->
+      <h2 class="card-title text-lg line-clamp-2 min-h-[3.5rem]">
+        {{ blogPost.title }}
+      </h2>
+      
+      <!-- Extracto -->
+      <p class="text-sm text-base-content/70 line-clamp-3 flex-grow">
+        {{ blogPost.excerpt }}
+      </p>
+      
+      <!-- Footer con autor y botón -->
+      <div class="card-actions justify-between items-center mt-4">
+        <span class="text-xs text-base-content/60">
+          Por {{ blogPost.author }}
+        </span>
+        <a 
+          [routerLink]="['/blog', blogPost.id]"
+          class="btn btn-primary btn-sm">
+          Leer más
+        </a>
+      </div>
+    } @else {
+      <!-- Contenido por defecto cuando no hay datos -->
+      <h2 class="card-title">Card Title</h2>
+      <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
+      <div class="card-actions justify-end mt-auto">
+        <button class="btn btn-primary btn-block">View More</button>
+      </div>
+    }
   </div>
 </div>

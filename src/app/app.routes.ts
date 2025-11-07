@@ -21,8 +21,18 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/aboutUs/aboutUs')
       .then(m => m.AboutUs)
   },
+    { 
+    path: 'blog', 
+    loadComponent: () => import('./pages/blog/blog')
+      .then(m => m.Blog)
+  },
+  { 
+    path: 'blog/:id', 
+    loadComponent: () => import('./pages/blogDetail/blogDetail')
+      .then(m => m.BlogDetail)
+  },
   { 
     path: '**', 
     redirectTo: '/home' 
-  }
+  },
 ];

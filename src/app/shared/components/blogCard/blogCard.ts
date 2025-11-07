@@ -1,9 +1,14 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { BlogPost } from '../../../pages/blog/models/BlogPost';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-blog-card',
-  imports: [],
+  imports: [RouterLink, DatePipe],
   templateUrl: './blogCard.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BlogCard { }
+export class BlogCard {
+  post = input<BlogPost | null>(null);
+}

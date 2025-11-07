@@ -12,5 +12,6 @@ export class Navbar {
     { label: 'Home', route: '/home' },
     { label: 'Products', route: '/products' },
     { label: 'About Us', route: '/about-us' },
+    { label: 'Blog', route: '/blog' },
   ];
 }
