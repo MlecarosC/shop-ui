@@ -60,6 +60,10 @@ export class ProductService {
     return this.products();
   }
 
+  getProductById(id: number) {
+    return this.products().find(product => product.id === id) || null;
+  }
+
   getFeaturedProducts(limit: number = 3) {
     return this.products().slice(0, limit);
   }
