@@ -1,14 +1,26 @@
-<div class="card bg-base-100 w-full max-w-xs shadow-sm">
-  <figure>
+<div class="card bg-base-100 w-full max-w-xs shadow-sm hover:shadow-md transition-shadow">
+  <figure class="h-48 overflow-hidden">
     <img
-      src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-      alt="Shoes" />
+      [src]="product()?.image ?? 'https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'"
+      [alt]="product()?.name ?? 'Product image'"
+      class="w-full h-full object-cover"
+    />
   </figure>
   <div class="card-body">
-    <h2 class="card-title">Card Title</h2>
-    <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-    <div class="card-actions justify-end">
-      <button class="btn btn-primary btn-block">Buy Now</button>
-    </div>
+    @if (product(); as prod) {
+      <div class="badge badge-primary badge-sm mb-2">{{ prod.category }}</div>
+      <h2 class="card-title text-lg">{{ prod.name }}</h2>
+      <p class="text-sm text-base-content/70 line-clamp-2">{{ prod.description }}</p>
+      <div class="card-actions justify-between items-center mt-4">
+        <span class="text-2xl font-bold text-primary">{{ prod.price | currency }}</span>
+        <button class="btn btn-primary btn-sm">Buy Now</button>
+      </div>
+    } @else {
+      <h2 class="card-title">Card Title</h2>
+      <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
+      <div class="card-actions justify-end">
+        <button class="btn btn-primary btn-block">Buy Now</button>
+      </div>
+    }
   </div>
 </div>

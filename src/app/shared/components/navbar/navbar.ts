@@ -10,5 +10,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 export class Navbar {
     readonly menuItems = [
     { label: 'Home', route: '/home' },
+    { label: 'Products', route: '/products' }
   ];
 }
