@@ -24,11 +24,17 @@ export class AuthApiService {
     const userJson = localStorage.getItem('current_user');
     
     if (token && userJson) {
-      this.authToken.set(token);
-      this.currentUser.set(JSON.parse(userJson));
-      this.isAuthenticated.set(true);
-
-      this.validateToken().subscribe();
+      try {
+        const user = JSON.parse(userJson);
+        this.authToken.set(token);
+        this.currentUser.set(user);
+        this.isAuthenticated.set(true);
+        
+        this.validateToken().subscribe();
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        this.logout();
+      }
     }
   }
 
@@ -39,10 +45,59 @@ export class AuthApiService {
       tap(response => {
         this.authToken.set(response.token);
         this.isAuthenticated.set(true);
-
         localStorage.setItem('auth_token', response.token);
-
-        this.getCurrentUser().subscribe();
+        
+        const user: WCUser = {
+          id: 0,
+          username: response.user_nicename,
+          name: response.user_display_name,
+          first_name: '',
+          last_name: '',
+          email: response.user_email,
+          url: '',
+          description: '',
+          link: '',
+          locale: '',
+          nickname: response.user_nicename,
+          slug: response.user_nicename,
+          registered_date: '',
+          roles: [],
+          capabilities: {},
+          extra_capabilities: {},
+          avatar_urls: { 24: '', 48: '', 96: '' },
+          meta: [],
+          billing: {
+            first_name: '',
+            last_name: '',
+            company: '',
+            address_1: '',
+            address_2: '',
+            city: '',
+            state: '',
+            postcode: '',
+            country: '',
+            email: response.user_email,
+            phone: ''
+          },
+          shipping: {
+            first_name: '',
+            last_name: '',
+            company: '',
+            address_1: '',
+            address_2: '',
+            city: '',
+            state: '',
+            postcode: '',
+            country: '',
+            email: '',
+            phone: ''
+          },
+          is_paying_customer: false,
+          avatar_url: ''
+        };
+        
+        this.currentUser.set(user);
+        localStorage.setItem('current_user', JSON.stringify(user));
       })
     );
   }
@@ -63,10 +118,10 @@ export class AuthApiService {
     );
   }
 
-  getCurrentUser(): Observable<WCUser> {
+  getCurrentUser(): Observable<WCUser | null> {
     const token = this.authToken();
     if (!token) {
-      return of(null as any);
+      return of(null);
     }
 
     const headers = new HttpHeaders({
@@ -80,9 +135,9 @@ export class AuthApiService {
         this.currentUser.set(user);
         localStorage.setItem('current_user', JSON.stringify(user));
       }),
-      catchError(() => {
-        this.logout();
-        return of(null as any);
+      catchError((error) => {
+        console.error('Error getting current user:', error);
+        return of(this.currentUser());
       })
     );
   }
@@ -100,7 +155,11 @@ export class AuthApiService {
     const url = `${this.baseUrl}/jwt-auth/v1/token/validate`;
     
     return this.http.post(url, {}, { headers }).pipe(
-      catchError(() => {
+      tap(() => {
+        console.log('Token is valid');
+      }),
+      catchError((error) => {
+        console.error('Token validation failed:', error);
         this.logout();
         return of({ valid: false });
       })
@@ -133,30 +192,29 @@ export class AuthApiService {
     localStorage.removeItem('cart_key');
   }
 
-    hasUserPurchasedProduct(productId: number): Observable<boolean> {
+  hasUserPurchasedProduct(productId: number): Observable<boolean> {
     const userId = this.currentUser()?.id;
     if (!userId) {
-        return of(false);
+      return of(false);
     }
 
     const url = `${environment.woocommerce.url}/orders`;
     const params = {
-        customer: userId.toString(),
-        status: 'completed',
-        per_page: '100'
+      customer: userId.toString(),
+      status: 'completed',
+      per_page: '100'
     };
 
     return this.http.get<any[]>(url, { params }).pipe(
-        map(orders => {
-        // Buscar si alguna orden contiene el producto
+      map(orders => {
         const hasPurchased = orders.some(order => 
-            order.line_items.some((item: any) => item.product_id === productId)
+          order.line_items.some((item: any) => item.product_id === productId)
         );
         return hasPurchased;
-        }),
-        catchError(() => of(false))
+      }),
+      catchError(() => of(false))
     );
-    }
+  }
 
   getAuthHeaders(): HttpHeaders {
     const token = this.authToken();

@@ -100,6 +100,27 @@
             </a>
           </li>
         }
+        
+        <div class="divider my-2"></div>
+        
+        @if (isAuthenticated()) {
+          <li>
+            <button 
+              (click)="logout()"
+              class="text-lg py-3 px-4 rounded-lg hover:bg-base-200 transition-colors text-left">
+              Cerrar Sesión
+            </button>
+          </li>
+        } @else {
+          <li>
+            <a 
+              routerLink="/login"
+              (click)="closeMenuDrawer()"
+              class="text-lg py-3 px-4 rounded-lg hover:bg-base-200 transition-colors">
+              Iniciar Sesión
+            </a>
+          </li>
+        }
       </ul>
     </div>
   </div>
