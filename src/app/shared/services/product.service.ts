@@ -18,13 +18,14 @@ export class ProductService {
   }
 
   private mapWCProductToProduct(wcProduct: WCProduct): Product {
-    const description = wcProduct.short_description || wcProduct.description;
-    const cleanDescription = this.stripHtml(description).trim();
+    const shortDescription = wcProduct.short_description || wcProduct.description;
+    const cleanDescription = this.stripHtml(shortDescription).trim();
 
     return {
       id: wcProduct.id,
       name: wcProduct.name,
       description: cleanDescription,
+      fullDescription: wcProduct.description,
       price: parseFloat(wcProduct.price),
       image: wcProduct.images[0]?.src || 'https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp',
       category: wcProduct.categories[0]?.name || 'General'

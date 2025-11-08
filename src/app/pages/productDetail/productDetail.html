@@ -30,7 +30,7 @@
         <div class="order-1 lg:order-2 flex flex-col justify-between h-[400px]">
 
           <div>
-            <span class="badge badge-primary">{{ prod.category }}</span>
+            <span class="badge badge-primary badge-lg">{{ prod.category }}</span>
           </div>
 
           <div class="flex-grow flex items-center">
@@ -55,26 +55,13 @@
       <div class="divider"></div>
 
       <div class="py-12">
-        <h2 class="text-3xl font-bold mb-6">Descripción del Producto</h2>
+        <h2 class="text-3xl font-bold mb-8 text-primary">Descripción del Curso</h2>
         
-        <div class="prose prose-lg max-w-none">
-          <p class="text-lg leading-relaxed text-base-content/80 mb-6">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          </p>
-
-          <h3 class="text-2xl font-bold mb-4 text-primary">Características Principales</h3>
-          <ul class="list-disc list-inside space-y-2 text-lg text-base-content/80 mb-6">
-            <li>Diseño moderno y elegante que se adapta a cualquier estilo</li>
-            <li>Materiales de alta calidad para mayor durabilidad</li>
-            <li>Fácil de usar con controles intuitivos</li>
-            <li>Tecnología avanzada para un rendimiento superior</li>
-            <li>Garantía extendida y soporte técnico incluido</li>
-          </ul>
-
-          <h3 class="text-2xl font-bold mb-4 text-primary">Especificaciones</h3>
-          <p class="text-lg leading-relaxed text-base-content/80 mb-6">
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.
-          </p>
+        <div class="bg-base-200 rounded-lg p-8">
+          <div 
+            class="product-description prose prose-lg max-w-none"
+            [innerHTML]="prod.fullDescription">
+          </div>
         </div>
       </div>
 
