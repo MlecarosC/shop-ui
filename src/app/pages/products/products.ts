@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@a
 import { ProductCard } from '../../shared/components/productCard/productCard';
 import { ProductService } from '../../shared/services/product.service';
 import { ProductsApiService } from '../../core/services/products-api.service';
+import { Loading } from '../../shared/components/loading/loading';
 
 @Component({
   selector: 'app-products',
-  imports: [ProductCard],
+  imports: [ProductCard, Loading],
   templateUrl: './products.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -16,6 +17,7 @@ export class Products {
   categories = signal<string[]>([]);
   selectedCategories = signal<Set<string>>(new Set());
   allProducts = this.productService.getAllProducts();
+  isLoading = signal(true);
 
   constructor() {
     this.productsApiService.getCategories({ per_page: 100 }).subscribe({
@@ -25,10 +27,15 @@ export class Products {
           .filter(name => name.toLowerCase() !== 'uncategorized')
           .sort();
         this.categories.set(categoryNames);
+        
+        setTimeout(() => {
+          this.isLoading.set(false);
+        }, 500);
       },
       error: (error) => {
         console.error('Error loading categories:', error);
         this.categories.set([]);
+        this.isLoading.set(false);
       }
     });
   }

@@ -1,5 +1,7 @@
 <div class="min-h-screen bg-base-100 py-12">
-  @if (product(); as prod) {
+  @if (isLoading()) {
+    <app-loading message="Cargando curso..." />
+  } @else if (product(); as prod) {
     <div class="max-w-6xl mx-auto px-6 md:px-10">
 
       <button 

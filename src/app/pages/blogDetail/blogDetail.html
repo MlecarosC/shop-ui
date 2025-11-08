@@ -1,5 +1,7 @@
 <div class="min-h-screen bg-base-100 py-12">
-  @if (post(); as blogPost) {
+  @if (isLoading()) {
+    <app-loading message="Cargando artículo..." />
+  } @else if (post(); as blogPost) {
     <article class="max-w-4xl mx-auto px-6 md:px-10">
 
       <button 
