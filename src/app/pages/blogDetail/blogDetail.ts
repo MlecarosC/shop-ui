@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { BlogService } from '../../shared/services/blog.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-blog-detail',
@@ -9,30 +10,30 @@ import { BlogService } from '../../shared/services/blog.service';
   templateUrl: './blogDetail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BlogDetail {
+export class BlogDetail implements OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private blogService = inject(BlogService);
+  private subscription = new Subscription();
 
   post = this.blogService.getPostById(0);
 
   constructor() {
-    this.route.params.subscribe(params => {
-      const id = Number(params['id']);
-      if (isNaN(id)) {
-        this.router.navigate(['/blog']);
-        return;
-      }
-      
-      this.post = this.blogService.getPostById(id);
-
-      effect(() => {
-        const currentPost = this.post();
-        if (currentPost === null && id !== 0) {
+    this.subscription.add(
+      this.route.params.subscribe(params => {
+        const id = Number(params['id']);
+        if (isNaN(id)) {
           this.router.navigate(['/blog']);
+          return;
         }
-      });
-    });
+        
+        this.post = this.blogService.getPostById(id);
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   goBack(): void {

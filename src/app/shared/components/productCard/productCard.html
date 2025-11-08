@@ -1,4 +1,4 @@
-<div class="card bg-base-100 w-full shadow-sm hover:shadow-md transition-shadow">
+<div class="card bg-base-100 w-full shadow-sm hover:shadow-md transition-shadow h-full">
   <figure class="h-48 overflow-hidden">
     <img
       [src]="product()?.image ?? 'https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'"
@@ -6,12 +6,20 @@
       class="w-full h-full object-cover"
     />
   </figure>
-  <div class="card-body">
+  <div class="card-body flex flex-col">
     @if (product(); as prod) {
       <div class="badge badge-primary badge-sm mb-2">{{ prod.category }}</div>
-      <h2 class="card-title text-lg">{{ prod.name }}</h2>
-      <p class="text-sm text-base-content/70 line-clamp-2">{{ prod.description }}</p>
-      <div class="card-actions justify-between items-center mt-4">
+      
+      <h2 class="card-title text-lg line-clamp-2 min-h-[3.5rem]">
+        {{ prod.name }}
+      </h2>
+      
+      <p class="text-sm text-base-content/70 flex-grow overflow-hidden" 
+         style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-height: 1.5rem; max-height: 4.5rem;">
+        {{ prod.description }}
+      </p>
+      
+      <div class="card-actions justify-between items-center mt-auto pt-4">
         <span class="text-2xl font-bold text-primary">{{ prod.price | currency }}</span>
         <a 
           [routerLink]="['/products', prod.id]"
