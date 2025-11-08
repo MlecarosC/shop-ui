@@ -13,7 +13,7 @@
         
         @if (categories().length > 0) {
           <form class="flex flex-wrap gap-3 items-center">
-            @for (category of categories(); track category) {
+            @for (category of categories(); track $index) {
               <input 
                 class="btn"
                 [class.btn-primary]="isCategorySelected(category)"

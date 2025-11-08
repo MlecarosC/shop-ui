@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, signal, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ProductService } from '../../shared/services/product.service';
 import { Subscription } from 'rxjs';
 import { Loading } from '../../shared/components/loading/loading';
+import { Product } from '../products/models/Product';
 
 @Component({
   selector: 'app-product-detail',
@@ -15,9 +17,10 @@ export class ProductDetail implements OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
+  private sanitizer = inject(DomSanitizer);
   private subscription = new Subscription();
 
-  product = this.productService.getProductById(0);
+  product = signal<Product | null>(null);
   isLoading = signal(true);
   minLoadingTime = 500;
   loadingStartTime = 0;
@@ -33,7 +36,14 @@ export class ProductDetail implements OnDestroy {
         
         this.isLoading.set(true);
         this.loadingStartTime = Date.now();
-        this.product = this.productService.getProductById(id);
+        
+        const productSignal = this.productService.getProductById(id);
+        effect(() => {
+          const prod = productSignal();
+          if (prod !== null) {
+            this.product.set(prod);
+          }
+        });
       })
     );
 
@@ -63,5 +73,9 @@ export class ProductDetail implements OnDestroy {
     if (prod) {
       console.log(`Added course ${prod.id} to cart`);
     }
+  }
+
+  getSafeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }

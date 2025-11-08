@@ -4,6 +4,7 @@ import { DatePipe } from '@angular/common';
 import { BlogService } from '../../shared/services/blog.service';
 import { Subscription } from 'rxjs';
 import { Loading } from '../../shared/components/loading/loading';
+import { BlogPost } from '../blog/models/BlogPost';
 
 @Component({
   selector: 'app-blog-detail',
@@ -17,7 +18,7 @@ export class BlogDetail implements OnDestroy {
   private blogService = inject(BlogService);
   private subscription = new Subscription();
 
-  post = this.blogService.getPostById(0);
+  post = signal<BlogPost | null>(null);
   isLoading = signal(true);
   minLoadingTime = 500;
   loadingStartTime = 0;
@@ -33,7 +34,14 @@ export class BlogDetail implements OnDestroy {
         
         this.isLoading.set(true);
         this.loadingStartTime = Date.now();
-        this.post = this.blogService.getPostById(id);
+        
+        const postSignal = this.blogService.getPostById(id);
+        effect(() => {
+          const blogPost = postSignal();
+          if (blogPost !== null) {
+            this.post.set(blogPost);
+          }
+        });
       })
     );
 

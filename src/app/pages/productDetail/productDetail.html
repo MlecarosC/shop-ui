@@ -62,7 +62,7 @@
         <div class="bg-base-200 rounded-lg p-8">
           <div 
             class="product-description prose prose-lg max-w-none"
-            [innerHTML]="prod.fullDescription">
+            [innerHTML]="getSafeHtml(prod.fullDescription)">
           </div>
         </div>
       </div>
