@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { ProductCard } from '../../shared/components/productCard/productCard';
 import { ProductService } from '../../shared/services/product.service';
 
@@ -13,7 +13,7 @@ export class Products {
   
   readonly categories = ['Electronics', 'Clothing', 'Books', 'Home', 'Sports', 'Toys'];
   selectedCategories = signal<Set<string>>(new Set());
-  allProducts = signal(this.productService.getAllProducts());
+  allProducts = this.productService.getAllProducts();
 
   filteredProducts = computed(() => {
     const selected = this.selectedCategories();

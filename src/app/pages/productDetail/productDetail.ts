@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
 import { ProductService } from '../../shared/services/product.service';
@@ -14,13 +14,7 @@ export class ProductDetail {
   private router = inject(Router);
   private productService = inject(ProductService);
 
-  productId = signal<number | null>(null);
-
-  product = computed(() => {
-    const id = this.productId();
-    if (id === null) return null;
-    return this.productService.getProductById(id);
-  });
+  product = this.productService.getProductById(0);
 
   constructor() {
     this.route.params.subscribe(params => {
@@ -29,11 +23,15 @@ export class ProductDetail {
         this.router.navigate(['/products']);
         return;
       }
-      this.productId.set(id);
       
-      if (!this.product()) {
-        this.router.navigate(['/products']);
-      }
+      this.product = this.productService.getProductById(id);
+
+      effect(() => {
+        const currentProduct = this.product();
+        if (currentProduct === null && id !== 0) {
+          this.router.navigate(['/products']);
+        }
+      });
     });
   }
 
@@ -42,7 +40,9 @@ export class ProductDetail {
   }
 
   addToCart(): void {
-    // Implementar lógica del carrito aquí
-    console.log(`Added course ${this.productId()} to cart`);
+    const prod = this.product();
+    if (prod) {
+      console.log(`Added course ${prod.id} to cart`);
+    }
   }
 }

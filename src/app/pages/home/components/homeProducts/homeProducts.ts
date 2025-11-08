@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ProductCard } from '../../../../shared/components/productCard/productCard';
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../../../shared/services/product.service';
@@ -12,5 +12,5 @@ import { ProductService } from '../../../../shared/services/product.service';
 export class HomeProducts {
   private productService = inject(ProductService);
   
-  featuredProducts = signal(this.productService.getFeaturedProducts(2));
+  featuredProducts = this.productService.getFeaturedProducts(2);
 }

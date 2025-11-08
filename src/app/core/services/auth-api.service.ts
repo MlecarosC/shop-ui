@@ -1,0 +1,179 @@
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, tap, catchError, of, map } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
+import { WCUser, WCAuthResponse } from '../models/woocommerce/wc-user.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthApiService {
+  private http = inject(HttpClient);
+  private baseUrl = environment.apiUrl;
+
+  private currentUser = signal<WCUser | null>(null);
+  private isAuthenticated = signal<boolean>(false);
+  private authToken = signal<string | null>(null);
+
+  constructor() {
+    this.checkStoredAuth();
+  }
+
+  private checkStoredAuth(): void {
+    const token = localStorage.getItem('auth_token');
+    const userJson = localStorage.getItem('current_user');
+    
+    if (token && userJson) {
+      this.authToken.set(token);
+      this.currentUser.set(JSON.parse(userJson));
+      this.isAuthenticated.set(true);
+
+      this.validateToken().subscribe();
+    }
+  }
+
+  login(username: string, password: string): Observable<WCAuthResponse> {
+    const url = `${this.baseUrl}/jwt-auth/v1/token`;
+    
+    return this.http.post<WCAuthResponse>(url, { username, password }).pipe(
+      tap(response => {
+        this.authToken.set(response.token);
+        this.isAuthenticated.set(true);
+
+        localStorage.setItem('auth_token', response.token);
+
+        this.getCurrentUser().subscribe();
+      })
+    );
+  }
+
+  register(userData: {
+    username: string;
+    email: string;
+    password: string;
+    first_name?: string;
+    last_name?: string;
+  }): Observable<WCUser> {
+    const url = `${environment.woocommerce.url}/customers`;
+    
+    return this.http.post<WCUser>(url, userData).pipe(
+      tap(user => {
+        this.login(userData.username, userData.password).subscribe();
+      })
+    );
+  }
+
+  getCurrentUser(): Observable<WCUser> {
+    const token = this.authToken();
+    if (!token) {
+      return of(null as any);
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    const url = `${this.baseUrl}/wp/v2/users/me`;
+    
+    return this.http.get<WCUser>(url, { headers }).pipe(
+      tap(user => {
+        this.currentUser.set(user);
+        localStorage.setItem('current_user', JSON.stringify(user));
+      }),
+      catchError(() => {
+        this.logout();
+        return of(null as any);
+      })
+    );
+  }
+
+  validateToken(): Observable<any> {
+    const token = this.authToken();
+    if (!token) {
+      return of({ valid: false });
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    const url = `${this.baseUrl}/jwt-auth/v1/token/validate`;
+    
+    return this.http.post(url, {}, { headers }).pipe(
+      catchError(() => {
+        this.logout();
+        return of({ valid: false });
+      })
+    );
+  }
+
+  updateProfile(userId: number, userData: Partial<WCUser>): Observable<WCUser> {
+    const token = this.authToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    const url = `${environment.woocommerce.url}/customers/${userId}`;
+    
+    return this.http.put<WCUser>(url, userData, { headers }).pipe(
+      tap(user => {
+        this.currentUser.set(user);
+        localStorage.setItem('current_user', JSON.stringify(user));
+      })
+    );
+  }
+
+  logout(): void {
+    this.authToken.set(null);
+    this.currentUser.set(null);
+    this.isAuthenticated.set(false);
+    
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('current_user');
+    localStorage.removeItem('cart_key');
+  }
+
+    hasUserPurchasedProduct(productId: number): Observable<boolean> {
+    const userId = this.currentUser()?.id;
+    if (!userId) {
+        return of(false);
+    }
+
+    const url = `${environment.woocommerce.url}/orders`;
+    const params = {
+        customer: userId.toString(),
+        status: 'completed',
+        per_page: '100'
+    };
+
+    return this.http.get<any[]>(url, { params }).pipe(
+        map(orders => {
+        // Buscar si alguna orden contiene el producto
+        const hasPurchased = orders.some(order => 
+            order.line_items.some((item: any) => item.product_id === productId)
+        );
+        return hasPurchased;
+        }),
+        catchError(() => of(false))
+    );
+    }
+
+  getAuthHeaders(): HttpHeaders {
+    const token = this.authToken();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
+  getCurrentUserSignal() {
+    return this.currentUser;
+  }
+
+  getIsAuthenticatedSignal() {
+    return this.isAuthenticated;
+  }
+
+  getAuthTokenSignal() {
+    return this.authToken;
+  }
+}

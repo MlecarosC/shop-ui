@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { BlogCard } from '../../../../shared/components/blogCard/blogCard';
 import { RouterLink } from '@angular/router';
 import { BlogService } from '../../../../shared/services/blog.service';
@@ -12,5 +12,5 @@ import { BlogService } from '../../../../shared/services/blog.service';
 export class HomeBlog {
   private blogService = inject(BlogService);
   
-  featuredPosts = signal(this.blogService.getFeaturedPosts(2));
+  featuredPosts = this.blogService.getFeaturedPosts(2);
 }

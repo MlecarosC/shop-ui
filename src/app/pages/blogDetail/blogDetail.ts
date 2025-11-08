@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, effect } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { BlogService } from '../../shared/services/blog.service';
@@ -14,13 +14,7 @@ export class BlogDetail {
   private router = inject(Router);
   private blogService = inject(BlogService);
 
-  postId = signal<number | null>(null);
-
-  post = computed(() => {
-    const id = this.postId();
-    if (id === null) return null;
-    return this.blogService.getPostById(id);
-  });
+  post = this.blogService.getPostById(0);
 
   constructor() {
     this.route.params.subscribe(params => {
@@ -29,11 +23,15 @@ export class BlogDetail {
         this.router.navigate(['/blog']);
         return;
       }
-      this.postId.set(id);
       
-      if (!this.post()) {
-        this.router.navigate(['/blog']);
-      }
+      this.post = this.blogService.getPostById(id);
+
+      effect(() => {
+        const currentPost = this.post();
+        if (currentPost === null && id !== 0) {
+          this.router.navigate(['/blog']);
+        }
+      });
     });
   }
 
