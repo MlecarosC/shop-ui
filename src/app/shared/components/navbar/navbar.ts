@@ -17,6 +17,7 @@ export class Navbar {
     { label: 'Products', route: '/products' },
     { label: 'About Us', route: '/about-us' },
     { label: 'Blog', route: '/blog' },
+    { label: 'Contact', route: '/contact' },
   ];
 
   isAuthenticated = computed(() => this.authService.getIsAuthenticatedSignal()());

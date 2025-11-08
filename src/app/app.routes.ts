@@ -55,6 +55,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/forgotPassword/forgotPassword')
       .then(m => m.ForgotPassword)
   },
+  {
+    path: 'contact',
+    loadComponent: () => import('./pages/contact/contact')
+      .then(m => m.Contact)
+  },
   { 
     path: '**', 
     redirectTo: '/home' 
