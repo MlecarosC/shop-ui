@@ -8,26 +8,34 @@
 
     <div class="mb-8 bg-base-200 p-6 rounded-lg">
       <h2 class="text-xl font-semibold mb-4">Filter by Category</h2>
-      <form class="flex flex-wrap gap-3 items-center">
-        @for (category of categories; track category) {
-          <input 
-            class="btn"
-            [class.btn-primary]="isCategorySelected(category)"
-            type="checkbox" 
-            name="categories" 
-            [attr.aria-label]="category"
-            [checked]="isCategorySelected(category)"
-            (change)="toggleCategory(category)"
-          />
-        }
-        <button 
-          class="btn btn-square btn-ghost" 
-          type="button"
-          (click)="resetFilters()"
-          aria-label="Clear filters">
-          ×
-        </button>
-      </form>
+      
+      @if (categories().length > 0) {
+        <form class="flex flex-wrap gap-3 items-center">
+          @for (category of categories(); track category) {
+            <input 
+              class="btn"
+              [class.btn-primary]="isCategorySelected(category)"
+              type="checkbox" 
+              name="categories" 
+              [attr.aria-label]="category"
+              [checked]="isCategorySelected(category)"
+              (change)="toggleCategory(category)"
+            />
+          }
+          <button 
+            class="btn btn-square btn-ghost" 
+            type="button"
+            (click)="resetFilters()"
+            aria-label="Clear filters">
+            ×
+          </button>
+        </form>
+      } @else {
+        <div class="flex items-center gap-2 text-base-content/70">
+          <span class="loading loading-spinner loading-sm"></span>
+          <span>Loading categories...</span>
+        </div>
+      }
     </div>
 
     <div class="mb-6">

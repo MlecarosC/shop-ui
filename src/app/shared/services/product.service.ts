@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ProductsApiService } from '../../core/services/products-api.service';
 import { Product } from '../../pages/products/models/Product';
@@ -11,11 +11,20 @@ import { map } from 'rxjs';
 export class ProductService {
   private productsApiService = inject(ProductsApiService);
 
+  private stripHtml(html: string): string {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    return tempDiv.textContent || tempDiv.innerText || '';
+  }
+
   private mapWCProductToProduct(wcProduct: WCProduct): Product {
+    const description = wcProduct.short_description || wcProduct.description;
+    const cleanDescription = this.stripHtml(description).trim();
+
     return {
       id: wcProduct.id,
       name: wcProduct.name,
-      description: wcProduct.short_description || wcProduct.description,
+      description: cleanDescription,
       price: parseFloat(wcProduct.price),
       image: wcProduct.images[0]?.src || 'https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp',
       category: wcProduct.categories[0]?.name || 'General'

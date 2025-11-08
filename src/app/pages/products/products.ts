@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { ProductCard } from '../../shared/components/productCard/productCard';
 import { ProductService } from '../../shared/services/product.service';
+import { ProductsApiService } from '../../core/services/products-api.service';
 
 @Component({
   selector: 'app-products',
@@ -10,10 +11,27 @@ import { ProductService } from '../../shared/services/product.service';
 })
 export class Products {
   private productService = inject(ProductService);
+  private productsApiService = inject(ProductsApiService);
   
-  readonly categories = ['Electronics', 'Clothing', 'Books', 'Home', 'Sports', 'Toys'];
+  categories = signal<string[]>([]);
   selectedCategories = signal<Set<string>>(new Set());
   allProducts = this.productService.getAllProducts();
+
+  constructor() {
+    this.productsApiService.getCategories({ per_page: 100 }).subscribe({
+      next: (cats) => {
+        const categoryNames = cats
+          .map(cat => cat.name)
+          .filter(name => name.toLowerCase() !== 'uncategorized')
+          .sort();
+        this.categories.set(categoryNames);
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.categories.set([]);
+      }
+    });
+  }
 
   filteredProducts = computed(() => {
     const selected = this.selectedCategories();
