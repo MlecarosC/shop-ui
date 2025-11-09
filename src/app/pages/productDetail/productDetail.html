@@ -33,6 +33,12 @@
 
           <div>
             <span class="badge badge-primary badge-lg">{{ prod.category }}</span>
+            
+            @if (userHasPurchased()) {
+              <span class="badge badge-success badge-lg ml-2">Ya Adquirido</span>
+            } @else if (isInCart()) {
+              <span class="badge badge-info badge-lg ml-2">En el Carrito</span>
+            }
           </div>
 
           <div class="flex-grow flex items-center">
@@ -41,13 +47,31 @@
             </p>
           </div>
 
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <span class="text-4xl font-bold text-primary">{{ prod.price | currency }}</span>
-            <button 
-              (click)="addToCart()"
-              class="btn btn-primary px-8 py-3">
-              Inscribirse al Curso
-            </button>
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+              <span class="text-4xl font-bold text-primary">{{ prod.price | currency }}</span>
+            </div>
+            
+            @if (isLoadingCart()) {
+              <button class="btn btn-primary btn-lg w-full" disabled>
+                <span class="loading loading-spinner"></span>
+                Procesando...
+              </button>
+            } @else if (userHasPurchased()) {
+              <button class="btn btn-lg w-full btn-disabled" disabled>
+                Ya has Adquirido este Curso
+              </button>
+            } @else if (isInCart()) {
+              <button class="btn btn-lg w-full btn-disabled" disabled>
+                Ya está en tu Carrito
+              </button>
+            } @else {
+              <button 
+                (click)="addToCart()"
+                class="btn btn-primary btn-lg w-full">
+                Inscribirse al Curso
+              </button>
+            }
           </div>
 
         </div>

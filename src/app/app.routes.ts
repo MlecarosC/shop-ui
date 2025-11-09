@@ -60,6 +60,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/contact/contact')
       .then(m => m.Contact)
   },
+    {
+    path: 'checkout',
+    loadComponent: () => import('./pages/checkout/checkout')
+      .then(m => m.Checkout)
+  },
   { 
     path: '**', 
     redirectTo: '/home' 
