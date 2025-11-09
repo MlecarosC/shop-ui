@@ -1,8 +1,15 @@
 <section class="w-full bg-base-100 py-12">
   <div class="max-w-6xl mx-auto px-6 md:px-10 flex flex-col md:flex-row gap-20">
+    <!-- Desktop View -->
     <div class="hidden md:flex gap-4">
-      @for (post of featuredPosts(); track post.id) {
-        <app-blog-card [post]="post"></app-blog-card>
+      @if (isLoading()) {
+        @for (i of [1, 2]; track i) {
+          <app-card-skeleton />
+        }
+      } @else {
+        @for (post of featuredPosts(); track post.id) {
+          <app-blog-card [post]="post"></app-blog-card>
+        }
       }
     </div>
 
@@ -20,12 +27,21 @@
       </a>
     </div>
 
+    <!-- Mobile View -->
     <div class="flex md:hidden gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory">
-      @for (post of featuredPosts(); track post.id) {
-        <app-blog-card 
-          [post]="post" 
-          class="flex-shrink-0 w-full max-w-xs snap-start">
-        </app-blog-card>
+      @if (isLoading()) {
+        @for (i of [1, 2]; track i) {
+          <app-card-skeleton 
+            class="flex-shrink-0 w-full max-w-xs snap-start">
+          </app-card-skeleton>
+        }
+      } @else {
+        @for (post of featuredPosts(); track post.id) {
+          <app-blog-card 
+            [post]="post" 
+            class="flex-shrink-0 w-full max-w-xs snap-start">
+          </app-blog-card>
+        }
       }
     </div>
   </div>

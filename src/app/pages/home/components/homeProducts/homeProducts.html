@@ -15,19 +15,37 @@
       </a>
     </div>
 
+    <!-- Desktop View -->
     <div class="hidden md:flex gap-4 items-stretch">
-      @for (product of featuredProducts(); track product.id) {
-        <div class="w-full max-w-xs">
-          <app-product-card [product]="product"></app-product-card>
-        </div>
+      @if (isLoading()) {
+        @for (i of [1, 2]; track i) {
+          <div class="w-full max-w-xs">
+            <app-card-skeleton />
+          </div>
+        }
+      } @else {
+        @for (product of featuredProducts(); track product.id) {
+          <div class="w-full max-w-xs">
+            <app-product-card [product]="product"></app-product-card>
+          </div>
+        }
       }
     </div>
 
+    <!-- Mobile View -->
     <div class="flex md:hidden gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory">
-      @for (product of featuredProducts(); track product.id) {
-        <div class="flex-shrink-0 w-full max-w-xs snap-start">
-          <app-product-card [product]="product"></app-product-card>
-        </div>
+      @if (isLoading()) {
+        @for (i of [1, 2]; track i) {
+          <div class="flex-shrink-0 w-full max-w-xs snap-start">
+            <app-card-skeleton />
+          </div>
+        }
+      } @else {
+        @for (product of featuredProducts(); track product.id) {
+          <div class="flex-shrink-0 w-full max-w-xs snap-start">
+            <app-product-card [product]="product"></app-product-card>
+          </div>
+        }
       }
     </div>
   </div>
