@@ -31,6 +31,7 @@
             type="text" 
             formControlName="username"
             placeholder="Ingresa tu usuario o email"
+            autocomplete="username"
             class="input input-bordered w-full"
             [class.input-error]="username?.invalid && username?.touched"
           />
@@ -49,6 +50,7 @@
             type="password" 
             formControlName="password"
             placeholder="Ingresa tu contraseña"
+            autocomplete="current-password"
             class="input input-bordered w-full"
             [class.input-error]="password?.invalid && password?.touched"
           />

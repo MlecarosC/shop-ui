@@ -108,6 +108,9 @@ export class Navbar {
   logout(): void {
     this.authService.logout();
     this.closeMenuDrawer();
+
+    this.toastService.info('Has cerrado sesión correctamente');
+    
     this.router.navigate(['/home']);
   }
 }

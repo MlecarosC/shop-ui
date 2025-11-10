@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthApiService } from '../../core/services/auth-api.service';
+import { ToastService } from '../../shared/services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -14,6 +15,7 @@ export class Register {
   private fb = inject(FormBuilder);
   private authService = inject(AuthApiService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   registerForm: FormGroup;
   isLoading = signal(false);
@@ -100,18 +102,25 @@ export class Register {
     this.authService.register({ username, email, password, first_name, last_name }).subscribe({
       next: () => {
         this.isLoading.set(false);
+
+        this.toastService.success('¡Cuenta creada exitosamente! Bienvenido');
+        
         this.router.navigate(['/home']);
       },
       error: (error) => {
         this.isLoading.set(false);
-        
+
         if (error.error?.code === 'registration-error-username-exists') {
           const newUsername = this.generateUsername(email);
           this.retryWithNewUsername(newUsername, email, password, first_name, last_name);
-        } else if (error.error?.message) {
-          this.errorMessage.set(error.error.message);
         } else if (error.error?.code === 'registration-error-email-exists') {
-          this.errorMessage.set('Este email ya está registrado');
+          this.errorMessage.set('Este email ya está registrado. ¿Deseas iniciar sesión?');
+        } else if (error.error?.message) {
+          const cleanMessage = error.error.message
+            .replace(/<[^>]*>/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+          this.errorMessage.set(cleanMessage);
         } else {
           this.errorMessage.set('Error al registrar. Por favor, intenta de nuevo.');
         }
@@ -125,6 +134,9 @@ export class Register {
     this.authService.register({ username, email, password, first_name, last_name }).subscribe({
       next: () => {
         this.isLoading.set(false);
+
+        this.toastService.success('¡Cuenta creada exitosamente! Bienvenido');
+        
         this.router.navigate(['/home']);
       },
       error: (error) => {

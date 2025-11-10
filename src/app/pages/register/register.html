@@ -32,6 +32,7 @@
               type="text" 
               formControlName="first_name"
               placeholder="Tu nombre"
+              autocomplete="given-name"
               class="input input-bordered w-full"
               [class.input-error]="first_name?.invalid && first_name?.touched"
             />
@@ -58,6 +59,7 @@
               type="text" 
               formControlName="last_name"
               placeholder="Tu apellido"
+              autocomplete="family-name"
               class="input input-bordered w-full"
               [class.input-error]="last_name?.invalid && last_name?.touched"
             />
@@ -85,6 +87,7 @@
             type="email" 
             formControlName="email"
             placeholder="tu@email.com"
+            autocomplete="email"
             class="input input-bordered w-full"
             [class.input-error]="email?.invalid && email?.touched"
           />
@@ -108,6 +111,7 @@
             type="password" 
             formControlName="password"
             placeholder="Mínimo 8 caracteres"
+            autocomplete="new-password"
             class="input input-bordered w-full"
             [class.input-error]="password?.invalid && password?.touched"
           />
@@ -169,6 +173,7 @@
             type="password" 
             formControlName="confirmPassword"
             placeholder="Repite tu contraseña"
+            autocomplete="new-password"
             class="input input-bordered w-full"
             [class.input-error]="(confirmPassword?.invalid && confirmPassword?.touched) || (registerForm.errors?.['passwordMismatch'] && confirmPassword?.touched)"
           />
