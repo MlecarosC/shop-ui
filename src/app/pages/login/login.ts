@@ -3,6 +3,8 @@ import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthApiService } from '../../core/services/auth-api.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { RateLimiterService } from '../../core/services/rate-limiter.service';
+import { validateRedirectUrl } from '../../core/utils/security.utils';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +18,7 @@ export class Login {
   private authService = inject(AuthApiService);
   private router = inject(Router);
   private toastService = inject(ToastService);
+  private rateLimiter = inject(RateLimiterService);
 
   loginForm: FormGroup;
   isLoading = signal(false);
@@ -33,6 +36,18 @@ export class Login {
       return;
     }
 
+    // Rate limiting: Max 5 login attempts per 15 minutes
+    const maxAttempts = 5;
+    const windowMs = 15 * 60 * 1000; // 15 minutes
+
+    if (!this.rateLimiter.isAllowed('login', maxAttempts, windowMs)) {
+      const waitTime = this.rateLimiter.getTimeUntilReset('login', maxAttempts, windowMs);
+      const minutes = Math.ceil(waitTime / 60000);
+      this.errorMessage.set(`Demasiados intentos. Intenta de nuevo en ${minutes} minuto(s).`);
+      this.toastService.warning(`Demasiados intentos. Espera ${minutes} minuto(s).`);
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
@@ -42,11 +57,16 @@ export class Login {
       next: (response) => {
         this.isLoading.set(false);
 
+        // Reset rate limiter on successful login
+        this.rateLimiter.reset('login');
+
         this.toastService.success('¡Bienvenido! Has iniciado sesión correctamente');
-        
-        const redirectUrl = localStorage.getItem('redirect_url') || '/home';
+
+        // Validate redirect URL to prevent open redirect attacks
+        const storedRedirectUrl = localStorage.getItem('redirect_url');
+        const redirectUrl = validateRedirectUrl(storedRedirectUrl);
         localStorage.removeItem('redirect_url');
-        
+
         this.router.navigate([redirectUrl]);
       },
       error: (error) => {
@@ -63,8 +83,6 @@ export class Login {
         } else {
           this.errorMessage.set('Error al iniciar sesión. Por favor, intenta de nuevo.');
         }
-        
-        console.error('Login error:', error);
       }
     });
   }

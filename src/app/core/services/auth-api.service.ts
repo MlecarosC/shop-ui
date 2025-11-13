@@ -3,12 +3,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, catchError, of, map } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { WCUser, WCAuthResponse } from '../models/woocommerce/wc-user.model';
+import { StorageEncryptionService } from './storage-encryption.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthApiService {
   private http = inject(HttpClient);
+  private storage = inject(StorageEncryptionService);
   private baseUrl = environment.apiUrl;
 
   private currentUser = signal<WCUser | null>(null);
@@ -20,33 +22,29 @@ export class AuthApiService {
   }
 
   private checkStoredAuth(): void {
-    const token = localStorage.getItem('auth_token');
-    const userJson = localStorage.getItem('current_user');
-    
-    if (token && userJson) {
-      try {
-        const user = JSON.parse(userJson);
-        this.authToken.set(token);
-        this.currentUser.set(user);
-        this.isAuthenticated.set(true);
-        
-        this.validateToken().subscribe();
-      } catch (error) {
-        console.error('Error parsing stored user:', error);
-        this.logout();
-      }
+    // Use encrypted storage for sensitive auth data
+    const token = this.storage.getSecureItem('auth_token');
+    const user = this.storage.getSecureJson<WCUser>('current_user');
+
+    if (token && user) {
+      this.authToken.set(token);
+      this.currentUser.set(user);
+      this.isAuthenticated.set(true);
+
+      this.validateToken().subscribe();
     }
   }
 
   login(username: string, password: string): Observable<WCAuthResponse> {
     const url = `${this.baseUrl}/jwt-auth/v1/token`;
-    
+
     return this.http.post<WCAuthResponse>(url, { username, password }).pipe(
       tap(response => {
         this.authToken.set(response.token);
         this.isAuthenticated.set(true);
-        localStorage.setItem('auth_token', response.token);
-        
+        // Store token encrypted
+        this.storage.setSecureItem('auth_token', response.token);
+
         const user: WCUser = {
           id: 0,
           username: response.user_nicename,
@@ -95,9 +93,10 @@ export class AuthApiService {
           is_paying_customer: false,
           avatar_url: ''
         };
-        
+
         this.currentUser.set(user);
-        localStorage.setItem('current_user', JSON.stringify(user));
+        // Store user data encrypted
+        this.storage.setSecureJson('current_user', user);
       })
     );
   }
@@ -133,10 +132,10 @@ export class AuthApiService {
     return this.http.get<WCUser>(url, { headers }).pipe(
       tap(user => {
         this.currentUser.set(user);
-        localStorage.setItem('current_user', JSON.stringify(user));
+        this.storage.setSecureJson('current_user', user);
       }),
       catchError((error) => {
-        console.error('Error getting current user:', error);
+        // Don't log full error details that might contain sensitive data
         return of(this.currentUser());
       })
     );
@@ -153,13 +152,10 @@ export class AuthApiService {
     });
 
     const url = `${this.baseUrl}/jwt-auth/v1/token/validate`;
-    
+
     return this.http.post(url, {}, { headers }).pipe(
-      tap(() => {
-        console.log('Token is valid');
-      }),
       catchError((error) => {
-        console.error('Token validation failed:', error);
+        // Token validation failed, logout user
         this.logout();
         return of({ valid: false });
       })
@@ -173,11 +169,11 @@ export class AuthApiService {
     });
 
     const url = `${environment.woocommerce.url}/customers/${userId}`;
-    
+
     return this.http.put<WCUser>(url, userData, { headers }).pipe(
       tap(user => {
         this.currentUser.set(user);
-        localStorage.setItem('current_user', JSON.stringify(user));
+        this.storage.setSecureJson('current_user', user);
       })
     );
   }
@@ -186,9 +182,10 @@ export class AuthApiService {
     this.authToken.set(null);
     this.currentUser.set(null);
     this.isAuthenticated.set(false);
-    
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('current_user');
+
+    // Clear encrypted storage
+    this.storage.removeSecureItem('auth_token');
+    this.storage.removeSecureItem('current_user');
     localStorage.removeItem('cart_key');
   }
 

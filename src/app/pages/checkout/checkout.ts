@@ -98,20 +98,8 @@ export class Checkout implements OnInit {
     // Por ahora solo simulamos el proceso
     const paymentMethod = this.checkoutForm.get('paymentMethod')?.value;
 
-    console.log('Processing order with:', {
-      paymentMethod,
-      billingData: {
-        first_name: this.checkoutForm.get('first_name')?.value,
-        last_name: this.checkoutForm.get('last_name')?.value,
-        email: this.checkoutForm.get('email')?.value,
-        phone: this.checkoutForm.get('phone')?.value,
-        country: this.checkoutForm.get('country')?.value,
-        address_1: this.checkoutForm.get('address_1')?.value,
-        city: this.checkoutForm.get('city')?.value,
-        state: this.checkoutForm.get('state')?.value,
-      },
-      cart: this.cart()
-    });
+    // Security: Do not log sensitive billing information
+    // In production, send this data securely to the backend
 
     // Simulación de procesamiento
     setTimeout(() => {

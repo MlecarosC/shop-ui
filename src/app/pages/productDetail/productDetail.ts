@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, signal, effect, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ProductService } from '../../shared/services/product.service';
 import { CartApiService } from '../../core/services/cart-api.service';
 import { AuthApiService } from '../../core/services/auth-api.service';
@@ -23,7 +22,6 @@ export class ProductDetail implements OnDestroy {
   private cartService = inject(CartApiService);
   private authService = inject(AuthApiService);
   private toastService = inject(ToastService);
-  private sanitizer = inject(DomSanitizer);
   private subscription = new Subscription();
 
   product = signal<Product | null>(null);
@@ -92,8 +90,9 @@ export class ProductDetail implements OnDestroy {
       next: (hasPurchased) => {
         this.userHasPurchased.set(hasPurchased);
       },
-      error: (error) => {
-        console.error('Error checking purchase status:', error);
+      error: () => {
+        // Silently fail - user can still add to cart if check fails
+        this.userHasPurchased.set(false);
       }
     });
   }
@@ -123,15 +122,10 @@ export class ProductDetail implements OnDestroy {
         this.isLoadingCart.set(false);
         this.toastService.success('Producto añadido al carrito');
       },
-      error: (error) => {
+      error: () => {
         this.isLoadingCart.set(false);
-        console.error('Error adding to cart:', error);
         this.toastService.error('Error al añadir al carrito. Intenta de nuevo.');
       }
     });
-  }
-
-  getSafeHtml(html: string): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }

@@ -4,6 +4,23 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 
+/**
+ * SECURITY WARNING: WooCommerce Interceptor
+ *
+ * This interceptor adds WooCommerce consumer credentials to API requests.
+ * While environment files are gitignored, exposing these credentials in the frontend
+ * is NOT recommended for production environments.
+ *
+ * RECOMMENDED APPROACH:
+ * - Move all WooCommerce API calls to a backend proxy/BFF (Backend-for-Frontend)
+ * - Backend should securely store credentials and make WooCommerce API calls
+ * - Frontend should only communicate with your backend, never directly with WooCommerce
+ *
+ * This implementation may be acceptable for:
+ * - Development/testing environments
+ * - Read-only operations with read-only API keys
+ * - Applications where WooCommerce credentials have very limited permissions
+ */
 export const woocommerceInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   
@@ -20,12 +37,9 @@ export const woocommerceInterceptor: HttpInterceptorFn = (req, next) => {
       ];
       
       if (jwtErrors.includes(errorCode)) {
-        console.log('Token JWT inválido o expirado, cerrando sesión...');
-        
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('current_user');
-        localStorage.removeItem('cart_key');
-        
+        // Clear all auth-related storage
+        localStorage.clear();
+
         router.navigate(['/login']);
       }
     }

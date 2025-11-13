@@ -82,11 +82,10 @@
 
       <div class="py-12">
         <h2 class="text-3xl font-bold mb-8 text-primary">Descripción del Curso</h2>
-        
+
         <div class="bg-base-200 rounded-lg p-8">
-          <div 
-            class="product-description prose prose-lg max-w-none"
-            [innerHTML]="getSafeHtml(prod.fullDescription)">
+          <div class="product-description prose prose-lg max-w-none whitespace-pre-wrap">
+            {{ prod.fullDescription }}
           </div>
         </div>
       </div>
