@@ -2,6 +2,18 @@
 
 Esta guía te ayudará a configurar los métodos de pago en tu backend de WordPress/WooCommerce para que funcionen con la aplicación Angular.
 
+## 🚀 Inicio Rápido
+
+Para que el sistema de pagos funcione, necesitas seguir estos pasos en orden:
+
+1. **Configurar CORS** (Ver sección "Configurar CORS") - **OBLIGATORIO** para que funcione el carrito
+2. **Instalar plugins de pago** (Mercado Pago y/o Transbank)
+3. **Agregar endpoints personalizados** (Ver sección "Endpoints Personalizados Necesarios")
+4. **Configurar credenciales** en cada plugin de pago
+5. **Probar en modo desarrollo** antes de ir a producción
+
+⚠️ **Nota:** Si experimentas errores CORS, asegúrate de que el header `Cart-Key` esté en la lista de headers permitidos.
+
 ## Requisitos Previos
 
 1. WordPress con WooCommerce instalado
@@ -26,28 +38,77 @@ En `wp-config.php` o mediante el admin de WordPress, asegúrate de que la API RE
 
 ### 2. Configurar CORS
 
+**IMPORTANTE:** El header `Cart-Key` es obligatorio para que funcione el carrito.
+
 Añade esto a tu archivo `functions.php` del tema activo:
 
 ```php
 add_action('rest_api_init', function() {
     remove_filter('rest_pre_serve_request', 'rest_send_cors_headers');
     add_filter('rest_pre_serve_request', function($value) {
-        $origin = get_http_origin();
+
+        // Orígenes permitidos
         $allowed_origins = [
-            'http://localhost:4200',
-            'https://tu-dominio.com'
+            'http://localhost:4200',           // Angular dev local
+            'https://tu-dominio.com'           // Tu dominio de producción
         ];
 
+        // Obtener el origen de la petición
+        $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+
+        // Verificar si el origen está permitido
         if (in_array($origin, $allowed_origins)) {
             header('Access-Control-Allow-Origin: ' . $origin);
-            header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
             header('Access-Control-Allow-Credentials: true');
-            header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce');
+        }
+
+        // Headers necesarios para CORS
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH');
+        header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, X-WP-Nonce, Cart-Key');
+        header('Access-Control-Expose-Headers: X-WP-Total, X-WP-TotalPages');
+        header('Access-Control-Max-Age: 86400');
+
+        // Manejar peticiones OPTIONS (preflight)
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            status_header(200);
+            exit();
         }
 
         return $value;
     });
 }, 15);
+
+// CORS adicional para CoCart específicamente
+add_filter('cocart_cors_allow_origin', function($allow_origin) {
+    return ['http://localhost:4200', 'http://127.0.0.1:4200', 'https://tu-dominio.com'];
+});
+```
+
+**Alternativa: Configuración en .htaccess**
+
+Si prefieres, también puedes configurar CORS directamente en tu `.htaccess` (agregar después de las reglas de HTTPS):
+
+```apache
+# BEGIN CORS Configuration
+<IfModule mod_headers.c>
+    # Permitir CORS desde localhost Angular
+    SetEnvIf Origin "^http://localhost:4200$" AccessControlAllowOrigin=$0
+    SetEnvIf Origin "^http://127.0.0.1:4200$" AccessControlAllowOrigin=$0
+    SetEnvIf Origin "^https://tu-dominio\.com$" AccessControlAllowOrigin=$0
+
+    Header always set Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    Header always set Access-Control-Allow-Headers "Authorization, Content-Type, X-Requested-With, X-WP-Nonce, Cart-Key"
+    Header always set Access-Control-Allow-Credentials "true"
+    Header always set Access-Control-Expose-Headers "X-WP-Total, X-WP-TotalPages"
+    Header always set Access-Control-Max-Age "86400"
+
+    # Manejar preflight OPTIONS
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+</IfModule>
+# END CORS Configuration
 ```
 
 ## Endpoints Personalizados Necesarios

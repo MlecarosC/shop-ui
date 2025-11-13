@@ -5,7 +5,7 @@ import { CurrencyPipe } from '@angular/common';
 import { CartApiService } from '../../core/services/cart-api.service';
 import { AuthApiService } from '../../core/services/auth-api.service';
 import { ToastService } from '../../shared/services/toast.service';
-import { GeoDataService, Country, Region, City } from '../../core/services/geo-data.service';
+import { GeoDataService, Country } from '../../core/services/geo-data.service';
 import { PaymentService, OrderData } from '../../core/services/payment.service';
 
 @Component({
@@ -33,8 +33,6 @@ export class Checkout implements OnInit {
 
   // Geo data
   countries: Country[] = [];
-  availableRegions = signal<Region[]>([]);
-  availableCities = signal<City[]>([]);
 
   canProcessOrder = computed(() => {
     return this.checkoutForm?.valid &&
@@ -56,7 +54,6 @@ export class Checkout implements OnInit {
   ngOnInit(): void {
     this.countries = this.geoDataService.getCountries();
     this.initializeForm();
-    this.setupFormListeners();
     this.loadUserData();
   }
 
@@ -70,79 +67,23 @@ export class Checkout implements OnInit {
       address_1: ['', [Validators.required]],
       city: ['', [Validators.required]],
       state: ['', [Validators.required]],
-      paymentMethod: ['', [Validators.required]],
-      termsAccepted: [false, [Validators.requiredTrue]]
+      paymentMethod: ['', [Validators.required]]
     });
   }
 
-  private setupFormListeners(): void {
-    // Listen to country changes to update regions
-    this.checkoutForm.get('country')?.valueChanges.subscribe(countryCode => {
-      if (countryCode) {
-        this.onCountryChange(countryCode);
-      }
-    });
-
-    // Listen to state/region changes to update cities
-    this.checkoutForm.get('state')?.valueChanges.subscribe(regionCode => {
-      if (regionCode) {
-        this.onRegionChange(regionCode);
-      }
-    });
-  }
-
-  onCountryChange(countryCode: string): void {
-    // Load regions for selected country
-    const regions = this.geoDataService.getRegionsByCountry(countryCode);
-    this.availableRegions.set(regions);
-
-    // Reset state and city when country changes
-    this.checkoutForm.patchValue({
-      state: '',
-      city: ''
-    }, { emitEvent: false });
-
-    this.availableCities.set([]);
-  }
-
-  onRegionChange(regionCode: string): void {
-    // Load cities for selected region
-    const cities = this.geoDataService.getCitiesByRegion(regionCode);
-    this.availableCities.set(cities);
-
-    // Reset city when region changes
-    this.checkoutForm.patchValue({
-      city: ''
-    }, { emitEvent: false });
-  }
 
   private loadUserData(): void {
     const user = this.currentUser();
     if (user) {
-      const countryCode = user.billing?.country || 'CL';
-      const stateCode = user.billing?.state || '';
-
-      // Load regions for user's country
-      if (countryCode) {
-        const regions = this.geoDataService.getRegionsByCountry(countryCode);
-        this.availableRegions.set(regions);
-
-        // Load cities for user's region
-        if (stateCode) {
-          const cities = this.geoDataService.getCitiesByRegion(stateCode);
-          this.availableCities.set(cities);
-        }
-      }
-
       this.checkoutForm.patchValue({
         first_name: user.first_name || '',
         last_name: user.last_name || '',
         email: user.email || '',
         phone: user.billing?.phone || '',
-        country: countryCode,
+        country: user.billing?.country || 'CL',
         address_1: user.billing?.address_1 || '',
         city: user.billing?.city || '',
-        state: stateCode
+        state: user.billing?.state || ''
       }, { emitEvent: false });
     }
   }
@@ -170,12 +111,6 @@ export class Checkout implements OnInit {
     }
 
     const paymentMethod = this.checkoutForm.get('paymentMethod')?.value;
-
-    // Handle FACTO separately (if implemented differently)
-    if (paymentMethod === 'facto') {
-      this.toastService.info('Procesando con FACTO... (Funcionalidad pendiente)');
-      return;
-    }
 
     this.isProcessing.set(true);
 
