@@ -68,12 +68,27 @@ export class CartApiService {
     const url = `${this.baseUrl}/cart/add-item`;
     const headers = this.getCartHeaders();
 
+    // Debug logging
+    console.log('Adding to cart:', {
+      productId,
+      quantity,
+      currentCartKey: this.cartKey(),
+      headers: headers.get('Cart-Key')
+    });
+
     return this.http.post<WCCart>(url, body, { headers }).pipe(
       tap(cart => {
+        console.log('Cart response:', {
+          cartKey: cart.cart_key,
+          itemCount: cart.item_count,
+          items: cart.items?.length || 0
+        });
+
         this.cart.set(cart);
         if (cart.cart_key && validateCartKey(cart.cart_key)) {
           this.cartKey.set(cart.cart_key);
           localStorage.setItem('cart_key', cart.cart_key);
+          console.log('Cart key saved:', cart.cart_key);
         }
       })
     );

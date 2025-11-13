@@ -42,18 +42,14 @@ export class Checkout implements OnInit {
   });
 
   constructor() {
-    // Watch for user authentication changes and auto-fill billing data
-    effect(() => {
-      const user = this.currentUser();
-      if (user && this.checkoutForm) {
-        this.loadUserData();
-      }
-    });
+    // Removed effect - was causing form values to be overwritten
   }
 
   ngOnInit(): void {
     this.countries = this.geoDataService.getCountries();
     this.initializeForm();
+
+    // Load user data only once on init
     this.loadUserData();
 
     // Expose debug method to window for console access
