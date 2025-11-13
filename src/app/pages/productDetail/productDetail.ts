@@ -13,7 +13,7 @@ import { Product } from '../products/models/Product';
   selector: 'app-product-detail',
   imports: [CurrencyPipe, Loading],
   templateUrl: './productDetail.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class ProductDetail implements OnDestroy {
   private route = inject(ActivatedRoute);

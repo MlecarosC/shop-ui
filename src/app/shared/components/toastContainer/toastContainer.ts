@@ -5,7 +5,7 @@ import { ToastService } from '../../services/toast.service';
   selector: 'app-toast-container',
   standalone: true,
   templateUrl: './toastContainer.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class ToastContainer {
   protected toastService = inject(ToastService);

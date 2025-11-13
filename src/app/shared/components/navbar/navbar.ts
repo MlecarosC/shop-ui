@@ -9,7 +9,7 @@ import { ToastService } from '../../services/toast.service';
   selector: 'app-navbar',
   imports: [RouterLink, RouterLinkActive, CurrencyPipe],
   templateUrl: './navbar.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class Navbar {
   private authService = inject(AuthApiService);
