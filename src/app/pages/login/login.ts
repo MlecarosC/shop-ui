@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthApiService } from '../../core/services/auth-api.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { RateLimiterService } from '../../core/services/rate-limiter.service';
+import { validateRedirectUrl } from '../../core/utils/security.utils';
 
 @Component({
   selector: 'app-login',
@@ -11,15 +13,18 @@ import { ToastService } from '../../shared/services/toast.service';
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Login {
+export class Login implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthApiService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
+  private rateLimiter = inject(RateLimiterService);
 
   loginForm: FormGroup;
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
+  private returnTo = signal<string | null>(null);
 
   constructor() {
     this.loginForm = this.fb.group({
@@ -28,8 +33,29 @@ export class Login {
     });
   }
 
+  ngOnInit(): void {
+    // Check if coming from checkout or another page
+    this.route.queryParams.subscribe(params => {
+      if (params['returnTo']) {
+        this.returnTo.set(params['returnTo']);
+      }
+    });
+  }
+
   onSubmit(): void {
     if (this.loginForm.invalid) {
+      return;
+    }
+
+    // Rate limiting: Max 5 login attempts per 15 minutes
+    const maxAttempts = 5;
+    const windowMs = 15 * 60 * 1000; // 15 minutes
+
+    if (!this.rateLimiter.isAllowed('login', maxAttempts, windowMs)) {
+      const waitTime = this.rateLimiter.getTimeUntilReset('login', maxAttempts, windowMs);
+      const minutes = Math.ceil(waitTime / 60000);
+      this.errorMessage.set(`Demasiados intentos. Intenta de nuevo en ${minutes} minuto(s).`);
+      this.toastService.warning(`Demasiados intentos. Espera ${minutes} minuto(s).`);
       return;
     }
 
@@ -42,11 +68,27 @@ export class Login {
       next: (response) => {
         this.isLoading.set(false);
 
+        // Reset rate limiter on successful login
+        this.rateLimiter.reset('login');
+
         this.toastService.success('¡Bienvenido! Has iniciado sesión correctamente');
-        
-        const redirectUrl = localStorage.getItem('redirect_url') || '/home';
-        localStorage.removeItem('redirect_url');
-        
+
+        // Determine redirect destination
+        let redirectUrl = '/home';
+
+        // Priority 1: Check if coming from checkout or specific page
+        const returnToPage = this.returnTo();
+        if (returnToPage === 'checkout') {
+          redirectUrl = '/checkout';
+        } else if (returnToPage) {
+          redirectUrl = validateRedirectUrl(`/${returnToPage}`);
+        } else {
+          // Priority 2: Check stored redirect URL (from auth guard)
+          const storedRedirectUrl = localStorage.getItem('redirect_url');
+          redirectUrl = validateRedirectUrl(storedRedirectUrl);
+          localStorage.removeItem('redirect_url');
+        }
+
         this.router.navigate([redirectUrl]);
       },
       error: (error) => {
@@ -63,8 +105,6 @@ export class Login {
         } else {
           this.errorMessage.set('Error al iniciar sesión. Por favor, intenta de nuevo.');
         }
-        
-        console.error('Login error:', error);
       }
     });
   }

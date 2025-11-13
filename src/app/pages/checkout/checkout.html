@@ -102,16 +102,14 @@
                     <label class="label">
                       <span class="label-text font-semibold">País *</span>
                     </label>
-                    <select 
+                    <select
                       formControlName="country"
                       class="select select-bordered w-full"
                       [class.select-error]="isFieldInvalid('country')">
                       <option value="">Selecciona un país</option>
-                      <option value="CL">Chile</option>
-                      <option value="AR">Argentina</option>
-                      <option value="PE">Perú</option>
-                      <option value="CO">Colombia</option>
-                      <option value="MX">México</option>
+                      @for (country of countries; track country.code) {
+                        <option [value]="country.code">{{ country.name }}</option>
+                      }
                     </select>
                     @if (isFieldInvalid('country')) {
                       <label class="label">
@@ -140,36 +138,36 @@
 
                   <div class="form-control">
                     <label class="label">
-                      <span class="label-text font-semibold">Ciudad *</span>
-                    </label>
-                    <input 
-                      type="text" 
-                      formControlName="city"
-                      placeholder="Tu ciudad"
-                      class="input input-bordered w-full"
-                      [class.input-error]="isFieldInvalid('city')"
-                    />
-                    @if (isFieldInvalid('city')) {
-                      <label class="label">
-                        <span class="label-text-alt text-error">La ciudad es requerida</span>
-                      </label>
-                    }
-                  </div>
-
-                  <div class="form-control">
-                    <label class="label">
                       <span class="label-text font-semibold">Región *</span>
                     </label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       formControlName="state"
-                      placeholder="Tu región"
+                      placeholder="Ingresa tu región"
                       class="input input-bordered w-full"
                       [class.input-error]="isFieldInvalid('state')"
                     />
                     @if (isFieldInvalid('state')) {
                       <label class="label">
                         <span class="label-text-alt text-error">La región es requerida</span>
+                      </label>
+                    }
+                  </div>
+
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text font-semibold">Ciudad *</span>
+                    </label>
+                    <input
+                      type="text"
+                      formControlName="city"
+                      placeholder="Ingresa tu ciudad"
+                      class="input input-bordered w-full"
+                      [class.input-error]="isFieldInvalid('city')"
+                    />
+                    @if (isFieldInvalid('city')) {
+                      <label class="label">
+                        <span class="label-text-alt text-error">La ciudad es requerida</span>
                       </label>
                     }
                   </div>
@@ -192,26 +190,30 @@
                       <h3 class="font-bold">Debes iniciar sesión</h3>
                       <div class="text-xs">Para procesar el pago necesitas estar autenticado</div>
                     </div>
-                    <a routerLink="/login" class="btn btn-sm">Iniciar Sesión</a>
+                    <a [routerLink]="['/login']" [queryParams]="{returnTo: 'checkout'}" class="btn btn-sm">Iniciar Sesión</a>
                   </div>
                 }
 
                 <div class="space-y-3">
                   <div class="form-control">
                     <label class="label cursor-pointer justify-start gap-4 p-4 bg-base-100 rounded-lg hover:bg-base-300 transition-colors">
-                      <input 
-                        type="radio" 
+                      <input
+                        type="radio"
                         formControlName="paymentMethod"
                         value="mercadopago"
-                        class="radio radio-primary" 
+                        class="radio radio-primary"
                       />
                       <div class="flex items-center gap-3">
-                        <div class="bg-white p-2 rounded">
-                          <span class="text-xl font-bold text-blue-500">MP</span>
+                        <div class="bg-white p-2 rounded flex items-center justify-center w-12 h-12">
+                          <svg width="32" height="32" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="128" cy="128" r="128" fill="#009EE3"/>
+                            <path d="M128 60C90.1 60 60 90.1 60 128s30.1 68 68 68 68-30.1 68-68-30.1-68-68-68zm0 120c-28.7 0-52-23.3-52-52s23.3-52 52-52 52 23.3 52 52-23.3 52-52 52z" fill="white"/>
+                            <circle cx="128" cy="128" r="32" fill="white"/>
+                          </svg>
                         </div>
                         <div>
                           <span class="label-text font-semibold">Mercado Pago</span>
-                          <p class="text-xs text-base-content/70">Paga con tarjeta o débito</p>
+                          <p class="text-xs text-base-content/70">Paga con tarjeta de crédito o débito</p>
                         </div>
                       </div>
                     </label>
@@ -219,39 +221,25 @@
 
                   <div class="form-control">
                     <label class="label cursor-pointer justify-start gap-4 p-4 bg-base-100 rounded-lg hover:bg-base-300 transition-colors">
-                      <input 
-                        type="radio" 
+                      <input
+                        type="radio"
                         formControlName="paymentMethod"
                         value="transbank"
-                        class="radio radio-primary" 
+                        class="radio radio-primary"
                       />
                       <div class="flex items-center gap-3">
-                        <div class="bg-white p-2 rounded">
-                          <span class="text-xl font-bold text-red-600">TB</span>
+                        <div class="bg-white p-2 rounded flex items-center justify-center w-12 h-12">
+                          <svg width="32" height="32" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="256" height="256" rx="16" fill="#E30613"/>
+                            <path d="M60 100h136v16H60v-16zm0 28h136v16H60v-16zm0 28h136v16H60v-16z" fill="white"/>
+                            <path d="M100 60h56v28h-56V60z" fill="white"/>
+                            <circle cx="80" cy="74" r="10" fill="white"/>
+                            <circle cx="176" cy="74" r="10" fill="white"/>
+                          </svg>
                         </div>
                         <div>
-                          <span class="label-text font-semibold">Transbank</span>
-                          <p class="text-xs text-base-content/70">Webpay Plus</p>
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-
-                  <div class="form-control">
-                    <label class="label cursor-pointer justify-start gap-4 p-4 bg-base-100 rounded-lg hover:bg-base-300 transition-colors">
-                      <input 
-                        type="radio" 
-                        formControlName="paymentMethod"
-                        value="facto"
-                        class="radio radio-primary" 
-                      />
-                      <div class="flex items-center gap-3">
-                        <div class="bg-white p-2 rounded">
-                          <span class="text-xl font-bold text-green-600">F</span>
-                        </div>
-                        <div>
-                          <span class="label-text font-semibold">FACTO</span>
-                          <p class="text-xs text-base-content/70">Facturación electrónica</p>
+                          <span class="label-text font-semibold">Transbank Webpay</span>
+                          <p class="text-xs text-base-content/70">Paga con tarjetas chilenas</p>
                         </div>
                       </div>
                     </label>
@@ -267,22 +255,13 @@
             </div>
 
             <!-- Términos y Condiciones -->
-            <div class="form-control">
-              <label class="label cursor-pointer justify-start gap-3">
-                <input 
-                  type="checkbox" 
-                  formControlName="termsAccepted"
-                  class="checkbox checkbox-primary" 
-                />
-                <span class="label-text">
-                  Acepto los <a href="#" class="link link-primary">términos y condiciones</a>
-                </span>
-              </label>
-              @if (checkoutForm.get('termsAccepted')?.touched && !checkoutForm.get('termsAccepted')?.value) {
-                <label class="label">
-                  <span class="label-text-alt text-error">Debes aceptar los términos y condiciones</span>
-                </label>
-              }
+            <div class="alert alert-info">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-sm">
+                Al realizar tu compra, aceptas nuestros <a href="#" class="link link-primary font-semibold">términos y condiciones</a>
+              </span>
             </div>
 
           </form>
@@ -336,7 +315,25 @@
                 </div>
               </div>
 
-              <button 
+              @if (!isAuthenticated()) {
+                <div class="alert alert-warning text-sm mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>Debes iniciar sesión para procesar el pago</span>
+                </div>
+              }
+
+              @if (isAuthenticated() && !checkoutForm.get('paymentMethod')?.value) {
+                <div class="alert alert-info text-sm mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Selecciona un método de pago</span>
+                </div>
+              }
+
+              <button
                 (click)="processOrder()"
                 [disabled]="!canProcessOrder()"
                 class="btn btn-primary btn-block btn-lg">
