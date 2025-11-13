@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, signal, computed, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed, OnInit, effect } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
 import { CartApiService } from '../../core/services/cart-api.service';
 import { AuthApiService } from '../../core/services/auth-api.service';
 import { ToastService } from '../../shared/services/toast.service';
+import { GeoDataService, Country, Region, City } from '../../core/services/geo-data.service';
+import { PaymentService, OrderData } from '../../core/services/payment.service';
 
 @Component({
   selector: 'app-checkout',
@@ -19,23 +21,42 @@ export class Checkout implements OnInit {
   private authService = inject(AuthApiService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+  private geoDataService = inject(GeoDataService);
+  private paymentService = inject(PaymentService);
 
   checkoutForm!: FormGroup;
   isProcessing = signal(false);
-  
+
   cart = this.cartService.getCartSignal();
   currentUser = this.authService.getCurrentUserSignal();
   isAuthenticated = computed(() => this.authService.getIsAuthenticatedSignal()());
 
+  // Geo data
+  countries: Country[] = [];
+  availableRegions = signal<Region[]>([]);
+  availableCities = signal<City[]>([]);
+
   canProcessOrder = computed(() => {
-    return this.checkoutForm?.valid && 
-           this.isAuthenticated() && 
+    return this.checkoutForm?.valid &&
+           this.isAuthenticated() &&
            !this.isProcessing() &&
            (this.cart()?.items?.length || 0) > 0;
   });
 
+  constructor() {
+    // Watch for user authentication changes and auto-fill billing data
+    effect(() => {
+      const user = this.currentUser();
+      if (user && this.checkoutForm) {
+        this.loadUserData();
+      }
+    });
+  }
+
   ngOnInit(): void {
+    this.countries = this.geoDataService.getCountries();
     this.initializeForm();
+    this.setupFormListeners();
     this.loadUserData();
   }
 
@@ -54,19 +75,75 @@ export class Checkout implements OnInit {
     });
   }
 
+  private setupFormListeners(): void {
+    // Listen to country changes to update regions
+    this.checkoutForm.get('country')?.valueChanges.subscribe(countryCode => {
+      if (countryCode) {
+        this.onCountryChange(countryCode);
+      }
+    });
+
+    // Listen to state/region changes to update cities
+    this.checkoutForm.get('state')?.valueChanges.subscribe(regionCode => {
+      if (regionCode) {
+        this.onRegionChange(regionCode);
+      }
+    });
+  }
+
+  onCountryChange(countryCode: string): void {
+    // Load regions for selected country
+    const regions = this.geoDataService.getRegionsByCountry(countryCode);
+    this.availableRegions.set(regions);
+
+    // Reset state and city when country changes
+    this.checkoutForm.patchValue({
+      state: '',
+      city: ''
+    }, { emitEvent: false });
+
+    this.availableCities.set([]);
+  }
+
+  onRegionChange(regionCode: string): void {
+    // Load cities for selected region
+    const cities = this.geoDataService.getCitiesByRegion(regionCode);
+    this.availableCities.set(cities);
+
+    // Reset city when region changes
+    this.checkoutForm.patchValue({
+      city: ''
+    }, { emitEvent: false });
+  }
+
   private loadUserData(): void {
     const user = this.currentUser();
     if (user) {
+      const countryCode = user.billing?.country || 'CL';
+      const stateCode = user.billing?.state || '';
+
+      // Load regions for user's country
+      if (countryCode) {
+        const regions = this.geoDataService.getRegionsByCountry(countryCode);
+        this.availableRegions.set(regions);
+
+        // Load cities for user's region
+        if (stateCode) {
+          const cities = this.geoDataService.getCitiesByRegion(stateCode);
+          this.availableCities.set(cities);
+        }
+      }
+
       this.checkoutForm.patchValue({
         first_name: user.first_name || '',
         last_name: user.last_name || '',
         email: user.email || '',
         phone: user.billing?.phone || '',
-        country: user.billing?.country || 'CL',
+        country: countryCode,
         address_1: user.billing?.address_1 || '',
         city: user.billing?.city || '',
-        state: user.billing?.state || ''
-      });
+        state: stateCode
+      }, { emitEvent: false });
     }
   }
 
@@ -78,48 +155,86 @@ export class Checkout implements OnInit {
   processOrder(): void {
     if (!this.canProcessOrder()) {
       this.markAllFieldsAsTouched();
-      
+
       if (!this.isAuthenticated()) {
         this.toastService.warning('Debes iniciar sesión para procesar el pago');
         return;
       }
-      
+
       if (!this.checkoutForm.valid) {
         this.toastService.warning('Por favor completa todos los campos requeridos');
         return;
       }
-      
+
+      return;
+    }
+
+    const paymentMethod = this.checkoutForm.get('paymentMethod')?.value;
+
+    // Handle FACTO separately (if implemented differently)
+    if (paymentMethod === 'facto') {
+      this.toastService.info('Procesando con FACTO... (Funcionalidad pendiente)');
       return;
     }
 
     this.isProcessing.set(true);
 
-    // TODO: Aquí se integrarán los métodos de pago
-    // Por ahora solo simulamos el proceso
-    const paymentMethod = this.checkoutForm.get('paymentMethod')?.value;
+    // Prepare order data
+    const orderData: OrderData = {
+      billing: {
+        first_name: this.checkoutForm.get('first_name')?.value,
+        last_name: this.checkoutForm.get('last_name')?.value,
+        email: this.checkoutForm.get('email')?.value,
+        phone: this.checkoutForm.get('phone')?.value,
+        country: this.checkoutForm.get('country')?.value,
+        address_1: this.checkoutForm.get('address_1')?.value,
+        city: this.checkoutForm.get('city')?.value,
+        state: this.checkoutForm.get('state')?.value
+      },
+      payment_method: paymentMethod,
+      payment_method_title: this.getPaymentMethodTitle(paymentMethod),
+      set_paid: false
+    };
 
-    // Security: Do not log sensitive billing information
-    // In production, send this data securely to the backend
+    // Process payment
+    this.paymentService.processPayment(paymentMethod, orderData).subscribe({
+      next: (response) => {
+        this.isProcessing.set(false);
 
-    // Simulación de procesamiento
-    setTimeout(() => {
-      this.isProcessing.set(false);
-      
-      switch (paymentMethod) {
-        case 'mercadopago':
-          this.toastService.info('Redirigiendo a Mercado Pago... (Funcionalidad pendiente)');
-          break;
-        case 'transbank':
-          this.toastService.info('Redirigiendo a Webpay... (Funcionalidad pendiente)');
-          break;
-        case 'facto':
-          this.toastService.info('Procesando con FACTO... (Funcionalidad pendiente)');
-          break;
+        // Redirect to payment gateway
+        if (response.redirect_url) {
+          this.toastService.success('Redirigiendo al procesador de pagos...');
+
+          // Redirect to external payment page
+          window.location.href = response.redirect_url;
+        } else {
+          this.toastService.error('No se pudo obtener la URL de pago');
+        }
+      },
+      error: (error) => {
+        this.isProcessing.set(false);
+
+        console.error('Payment processing error:', error);
+
+        if (error.status === 400) {
+          this.toastService.error('Error en los datos de pago. Verifica la información.');
+        } else if (error.status === 401 || error.status === 403) {
+          this.toastService.error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+          this.router.navigate(['/login'], { queryParams: { returnTo: 'checkout' } });
+        } else {
+          this.toastService.error('Error al procesar el pago. Por favor, intenta de nuevo.');
+        }
       }
+    });
+  }
 
-      // TODO: Aquí se redirigirá a la página de confirmación cuando esté lista
-      // this.router.navigate(['/order-confirmation']);
-    }, 2000);
+  private getPaymentMethodTitle(method: string): string {
+    const titles: Record<string, string> = {
+      mercadopago: 'Mercado Pago',
+      transbank: 'Transbank Webpay Plus',
+      facto: 'FACTO'
+    };
+    return titles[method] || method;
   }
 
   private markAllFieldsAsTouched(): void {

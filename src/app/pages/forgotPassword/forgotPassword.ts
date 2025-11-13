@@ -89,16 +89,11 @@ export class ForgotPassword {
       },
       error: (error) => {
         this.isLoading.set(false);
-        
-        if (error.error?.message) {
-          this.errorMessage.set(error.error.message);
-        } else if (error.error?.code === 'bad_email') {
-          this.errorMessage.set('No existe una cuenta con este correo electrónico');
-        } else {
-          this.errorMessage.set('Error al enviar el código. Por favor, intenta de nuevo.');
-        }
-        
-        console.error('Password reset error:', error);
+
+        // Security: Don't reveal if email exists or not
+        // Always show the same generic message
+        this.step.set('code');
+        this.errorMessage.set(null);
       }
     });
   }
@@ -132,8 +127,6 @@ export class ForgotPassword {
         } else {
           this.errorMessage.set('Error al restablecer la contraseña. Por favor, intenta de nuevo.');
         }
-        
-        console.error('Set password error:', error);
       }
     });
   }

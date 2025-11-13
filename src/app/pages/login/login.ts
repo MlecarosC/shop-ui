@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthApiService } from '../../core/services/auth-api.service';
 import { ToastService } from '../../shared/services/toast.service';
@@ -13,21 +13,32 @@ import { validateRedirectUrl } from '../../core/utils/security.utils';
   templateUrl: './login.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Login {
+export class Login implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthApiService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
   private rateLimiter = inject(RateLimiterService);
 
   loginForm: FormGroup;
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
+  private returnTo = signal<string | null>(null);
 
   constructor() {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required]]
+    });
+  }
+
+  ngOnInit(): void {
+    // Check if coming from checkout or another page
+    this.route.queryParams.subscribe(params => {
+      if (params['returnTo']) {
+        this.returnTo.set(params['returnTo']);
+      }
     });
   }
 
@@ -62,10 +73,21 @@ export class Login {
 
         this.toastService.success('¡Bienvenido! Has iniciado sesión correctamente');
 
-        // Validate redirect URL to prevent open redirect attacks
-        const storedRedirectUrl = localStorage.getItem('redirect_url');
-        const redirectUrl = validateRedirectUrl(storedRedirectUrl);
-        localStorage.removeItem('redirect_url');
+        // Determine redirect destination
+        let redirectUrl = '/home';
+
+        // Priority 1: Check if coming from checkout or specific page
+        const returnToPage = this.returnTo();
+        if (returnToPage === 'checkout') {
+          redirectUrl = '/checkout';
+        } else if (returnToPage) {
+          redirectUrl = validateRedirectUrl(`/${returnToPage}`);
+        } else {
+          // Priority 2: Check stored redirect URL (from auth guard)
+          const storedRedirectUrl = localStorage.getItem('redirect_url');
+          redirectUrl = validateRedirectUrl(storedRedirectUrl);
+          localStorage.removeItem('redirect_url');
+        }
 
         this.router.navigate([redirectUrl]);
       },

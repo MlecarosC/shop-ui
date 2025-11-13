@@ -102,16 +102,14 @@
                     <label class="label">
                       <span class="label-text font-semibold">País *</span>
                     </label>
-                    <select 
+                    <select
                       formControlName="country"
                       class="select select-bordered w-full"
                       [class.select-error]="isFieldInvalid('country')">
                       <option value="">Selecciona un país</option>
-                      <option value="CL">Chile</option>
-                      <option value="AR">Argentina</option>
-                      <option value="PE">Perú</option>
-                      <option value="CO">Colombia</option>
-                      <option value="MX">México</option>
+                      @for (country of countries; track country.code) {
+                        <option [value]="country.code">{{ country.name }}</option>
+                      }
                     </select>
                     @if (isFieldInvalid('country')) {
                       <label class="label">
@@ -140,36 +138,42 @@
 
                   <div class="form-control">
                     <label class="label">
-                      <span class="label-text font-semibold">Ciudad *</span>
+                      <span class="label-text font-semibold">Región *</span>
                     </label>
-                    <input 
-                      type="text" 
-                      formControlName="city"
-                      placeholder="Tu ciudad"
-                      class="input input-bordered w-full"
-                      [class.input-error]="isFieldInvalid('city')"
-                    />
-                    @if (isFieldInvalid('city')) {
+                    <select
+                      formControlName="state"
+                      class="select select-bordered w-full"
+                      [class.select-error]="isFieldInvalid('state')"
+                      [disabled]="availableRegions().length === 0">
+                      <option value="">Selecciona una región</option>
+                      @for (region of availableRegions(); track region.code) {
+                        <option [value]="region.code">{{ region.name }}</option>
+                      }
+                    </select>
+                    @if (isFieldInvalid('state')) {
                       <label class="label">
-                        <span class="label-text-alt text-error">La ciudad es requerida</span>
+                        <span class="label-text-alt text-error">La región es requerida</span>
                       </label>
                     }
                   </div>
 
                   <div class="form-control">
                     <label class="label">
-                      <span class="label-text font-semibold">Región *</span>
+                      <span class="label-text font-semibold">Ciudad *</span>
                     </label>
-                    <input 
-                      type="text" 
-                      formControlName="state"
-                      placeholder="Tu región"
-                      class="input input-bordered w-full"
-                      [class.input-error]="isFieldInvalid('state')"
-                    />
-                    @if (isFieldInvalid('state')) {
+                    <select
+                      formControlName="city"
+                      class="select select-bordered w-full"
+                      [class.select-error]="isFieldInvalid('city')"
+                      [disabled]="availableCities().length === 0">
+                      <option value="">Selecciona una ciudad</option>
+                      @for (city of availableCities(); track city.name) {
+                        <option [value]="city.name">{{ city.name }}</option>
+                      }
+                    </select>
+                    @if (isFieldInvalid('city')) {
                       <label class="label">
-                        <span class="label-text-alt text-error">La región es requerida</span>
+                        <span class="label-text-alt text-error">La ciudad es requerida</span>
                       </label>
                     }
                   </div>
@@ -192,7 +196,7 @@
                       <h3 class="font-bold">Debes iniciar sesión</h3>
                       <div class="text-xs">Para procesar el pago necesitas estar autenticado</div>
                     </div>
-                    <a routerLink="/login" class="btn btn-sm">Iniciar Sesión</a>
+                    <a [routerLink]="['/login']" [queryParams]="{returnTo: 'checkout'}" class="btn btn-sm">Iniciar Sesión</a>
                   </div>
                 }
 
