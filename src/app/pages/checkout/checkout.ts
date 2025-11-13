@@ -35,10 +35,32 @@ export class Checkout implements OnInit {
   countries: Country[] = [];
 
   canProcessOrder = computed(() => {
-    return this.checkoutForm?.valid &&
-           this.isAuthenticated() &&
-           !this.isProcessing() &&
-           (this.cart()?.items?.length || 0) > 0;
+    const formValid = this.checkoutForm?.valid || false;
+    const authenticated = this.isAuthenticated();
+    const processing = this.isProcessing();
+    const hasItems = (this.cart()?.items?.length || 0) > 0;
+
+    // Debug logging (temporary - remove in production)
+    if (this.checkoutForm) {
+      console.log('Form validation:', {
+        formValid,
+        authenticated,
+        processing,
+        hasItems,
+        formErrors: this.checkoutForm.errors,
+        formValue: this.checkoutForm.value
+      });
+
+      // Log invalid fields
+      Object.keys(this.checkoutForm.controls).forEach(key => {
+        const control = this.checkoutForm.get(key);
+        if (control?.invalid) {
+          console.log(`Invalid field: ${key}`, control.errors);
+        }
+      });
+    }
+
+    return formValid && authenticated && !processing && hasItems;
   });
 
   constructor() {
