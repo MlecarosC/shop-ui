@@ -1,9 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { WCCart, WCCartItem } from '../models/woocommerce/wc-cart.model';
-import { validateCartKey } from '../utils/security.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -17,37 +16,20 @@ export class CartApiService {
 
   constructor() {
     const savedCartKey = localStorage.getItem('cart_key');
-    if (savedCartKey && validateCartKey(savedCartKey)) {
+    if (savedCartKey) {
       this.cartKey.set(savedCartKey);
       this.getCart().subscribe();
-    } else if (savedCartKey) {
-      // Invalid cart key, remove it
-      localStorage.removeItem('cart_key');
     }
-  }
-
-  /**
-   * Get HTTP headers with cart key (more secure than URL params)
-   */
-  private getCartHeaders(): HttpHeaders {
-    const key = this.cartKey();
-    let headers = new HttpHeaders();
-
-    if (key) {
-      headers = headers.set('Cart-Key', key);
-    }
-
-    return headers;
   }
 
   getCart(): Observable<WCCart> {
-    const url = `${this.baseUrl}/cart`;
-    const headers = this.getCartHeaders();
+    const key = this.cartKey();
+    const url = key ? `${this.baseUrl}/cart?cart_key=${key}` : `${this.baseUrl}/cart`;
 
-    return this.http.get<WCCart>(url, { headers }).pipe(
+    return this.http.get<WCCart>(url).pipe(
       tap(cart => {
         this.cart.set(cart);
-        if (cart.cart_key && validateCartKey(cart.cart_key)) {
+        if (cart.cart_key) {
           this.cartKey.set(cart.cart_key);
           localStorage.setItem('cart_key', cart.cart_key);
         }
@@ -65,13 +47,13 @@ export class CartApiService {
       body.variation = variation;
     }
 
-    const url = `${this.baseUrl}/cart/add-item`;
-    const headers = this.getCartHeaders();
+    const key = this.cartKey();
+    const url = key ? `${this.baseUrl}/cart/add-item?cart_key=${key}` : `${this.baseUrl}/cart/add-item`;
 
-    return this.http.post<WCCart>(url, body, { headers }).pipe(
+    return this.http.post<WCCart>(url, body).pipe(
       tap(cart => {
         this.cart.set(cart);
-        if (cart.cart_key && validateCartKey(cart.cart_key)) {
+        if (cart.cart_key) {
           this.cartKey.set(cart.cart_key);
           localStorage.setItem('cart_key', cart.cart_key);
         }
@@ -80,28 +62,28 @@ export class CartApiService {
   }
 
   updateCartItem(itemKey: string, quantity: number): Observable<WCCart> {
-    const url = `${this.baseUrl}/cart/item/${itemKey}`;
-    const headers = this.getCartHeaders();
+    const key = this.cartKey();
+    const url = `${this.baseUrl}/cart/item/${itemKey}?cart_key=${key}`;
 
-    return this.http.post<WCCart>(url, { quantity: quantity.toString() }, { headers }).pipe(
+    return this.http.post<WCCart>(url, { quantity: quantity.toString() }).pipe(
       tap(cart => this.cart.set(cart))
     );
   }
 
   removeCartItem(itemKey: string): Observable<WCCart> {
-    const url = `${this.baseUrl}/cart/item/${itemKey}`;
-    const headers = this.getCartHeaders();
+    const key = this.cartKey();
+    const url = `${this.baseUrl}/cart/item/${itemKey}?cart_key=${key}`;
 
-    return this.http.delete<WCCart>(url, { headers }).pipe(
+    return this.http.delete<WCCart>(url).pipe(
       tap(cart => this.cart.set(cart))
     );
   }
 
   clearCart(): Observable<any> {
-    const url = `${this.baseUrl}/cart/clear`;
-    const headers = this.getCartHeaders();
+    const key = this.cartKey();
+    const url = `${this.baseUrl}/cart/clear?cart_key=${key}`;
 
-    return this.http.post(url, {}, { headers }).pipe(
+    return this.http.post(url, {}).pipe(
       tap(() => {
         this.cart.set(null);
         this.cartKey.set(null);
@@ -113,7 +95,7 @@ export class CartApiService {
   isProductInCart(productId: number): boolean {
     const currentCart = this.cart();
     if (!currentCart || !currentCart.items) return false;
-    
+
     return currentCart.items.some(item => item.id === productId);
   }
 

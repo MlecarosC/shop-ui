@@ -6,13 +6,11 @@ Esta guía te ayudará a configurar los métodos de pago en tu backend de WordPr
 
 Para que el sistema de pagos funcione, necesitas seguir estos pasos en orden:
 
-1. **Configurar CORS** (Ver sección "Configurar CORS") - **OBLIGATORIO** para que funcione el carrito
+1. **Configurar CORS** (Ver sección "Configurar CORS") - Necesario para peticiones desde Angular
 2. **Instalar plugins de pago** (Mercado Pago y/o Transbank)
 3. **Agregar endpoints personalizados** (Ver sección "Endpoints Personalizados Necesarios")
 4. **Configurar credenciales** en cada plugin de pago
 5. **Probar en modo desarrollo** antes de ir a producción
-
-⚠️ **Nota:** Si experimentas errores CORS, asegúrate de que el header `Cart-Key` esté en la lista de headers permitidos.
 
 ## Requisitos Previos
 
@@ -38,8 +36,6 @@ En `wp-config.php` o mediante el admin de WordPress, asegúrate de que la API RE
 
 ### 2. Configurar CORS
 
-**IMPORTANTE:** El header `Cart-Key` es obligatorio para que funcione el carrito.
-
 Añade esto a tu archivo `functions.php` del tema activo:
 
 ```php
@@ -64,7 +60,7 @@ add_action('rest_api_init', function() {
 
         // Headers necesarios para CORS
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH');
-        header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, X-WP-Nonce, Cart-Key');
+        header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With, X-WP-Nonce');
         header('Access-Control-Expose-Headers: X-WP-Total, X-WP-TotalPages');
         header('Access-Control-Max-Age: 86400');
 
@@ -98,7 +94,7 @@ Si prefieres, también puedes configurar CORS directamente en tu `.htaccess` (ag
 
     Header always set Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
     Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-    Header always set Access-Control-Allow-Headers "Authorization, Content-Type, X-Requested-With, X-WP-Nonce, Cart-Key"
+    Header always set Access-Control-Allow-Headers "Authorization, Content-Type, X-Requested-With, X-WP-Nonce"
     Header always set Access-Control-Allow-Credentials "true"
     Header always set Access-Control-Expose-Headers "X-WP-Total, X-WP-TotalPages"
     Header always set Access-Control-Max-Age "86400"
