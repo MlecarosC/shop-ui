@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
+import { AuthApiService } from '../services/auth-api.service';
 
 /**
  * SECURITY WARNING: WooCommerce Interceptor
@@ -23,11 +24,12 @@ import { environment } from '../../../environments/environment.development';
  */
 export const woocommerceInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
-  
+  const authService = inject(AuthApiService);
+
   const handleAuthError = (error: HttpErrorResponse) => {
     if (error.status === 401 || error.status === 403) {
       const errorCode = error.error?.code;
-      
+
       const jwtErrors = [
         'jwt_auth_invalid_token',
         'jwt_auth_bad_auth_header',
@@ -35,7 +37,7 @@ export const woocommerceInterceptor: HttpInterceptorFn = (req, next) => {
         'jwt_auth_bad_request',
         'jwt_auth_expired_token'
       ];
-      
+
       if (jwtErrors.includes(errorCode)) {
         // Clear all auth-related storage
         localStorage.clear();
@@ -45,20 +47,33 @@ export const woocommerceInterceptor: HttpInterceptorFn = (req, next) => {
     }
     return throwError(() => error);
   };
-  
+
   if (req.url.includes('/wc/v3/')) {
-    const modifiedReq = req.clone({
+    // Get JWT token if available
+    const token = authService.getAuthTokenSignal()();
+
+    // Start with WooCommerce API credentials
+    let modifiedReq = req.clone({
       setParams: {
         consumer_key: environment.woocommerce.consumerKey,
         consumer_secret: environment.woocommerce.consumerSecret
       }
     });
-    
+
+    // Add JWT token for authenticated endpoints
+    if (token) {
+      modifiedReq = modifiedReq.clone({
+        setHeaders: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+    }
+
     return next(modifiedReq).pipe(
       catchError(handleAuthError)
     );
   }
-  
+
   return next(req).pipe(
     catchError(handleAuthError)
   );
