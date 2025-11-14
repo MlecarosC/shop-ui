@@ -1,0 +1,113 @@
+@if (logos.length > 0) {
+  <div class="logo-carousel-container overflow-hidden py-8 bg-base-200">
+    <div
+      class="logo-carousel-track"
+      [class.pause-on-hover]="pauseOnHover"
+      [style]="animationStyle"
+    >
+      <div class="logo-carousel-content">
+        @for (logo of duplicatedLogos(); track $index) {
+          <div class="logo-item">
+            <img
+              [src]="logo"
+              [alt]="'Logo ' + ($index + 1)"
+              [style.height.px]="logoHeight"
+              class="object-contain opacity-60 hover:opacity-100 transition-opacity duration-300"
+              loading="lazy"
+            />
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+} @else {
+  <!-- Placeholder when no logos -->
+  <div class="py-8 bg-base-200">
+    <div class="text-center text-base-content/50">
+      <p class="text-sm">No hay logos para mostrar</p>
+    </div>
+  </div>
+}
+
+<style>
+  .logo-carousel-container {
+    --animation-duration: 30s;
+    position: relative;
+    width: 100%;
+  }
+
+  .logo-carousel-track {
+    display: flex;
+    width: 100%;
+  }
+
+  .logo-carousel-content {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    animation: scroll var(--animation-duration) linear infinite;
+  }
+
+  .logo-item {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px;
+    padding: 0 1rem;
+  }
+
+  /* Animation keyframes */
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Pause animation on hover */
+  .logo-carousel-track.pause-on-hover:hover .logo-carousel-content {
+    animation-play-state: paused;
+  }
+
+  /* Smooth animation */
+  .logo-carousel-content {
+    will-change: transform;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .logo-carousel-content {
+      gap: 2rem;
+    }
+
+    .logo-item {
+      min-width: 100px;
+      padding: 0 0.5rem;
+    }
+  }
+
+  /* Gradient masks for smooth edges (optional) */
+  .logo-carousel-container::before,
+  .logo-carousel-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .logo-carousel-container::before {
+    left: 0;
+    background: linear-gradient(to right, hsl(var(--b2)), transparent);
+  }
+
+  .logo-carousel-container::after {
+    right: 0;
+    background: linear-gradient(to left, hsl(var(--b2)), transparent);
+  }
+</style>

@@ -1,0 +1,87 @@
+<!-- Featured Products Section -->
+<section class="py-16 bg-base-100">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section Header -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl sm:text-5xl font-bold text-base-content mb-4">
+        Productos Destacados
+      </h2>
+      <p class="text-lg text-base-content/70 max-w-2xl mx-auto">
+        Descubre nuestra selección de productos más populares y mejor valorados
+        por nuestros clientes
+      </p>
+      <div class="divider max-w-xs mx-auto"></div>
+    </div>
+
+    <!-- Products Grid -->
+    @if (isLoading()) {
+      <!-- Loading State with Skeletons -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12"
+      >
+        @for (item of skeletonArray; track $index) {
+          <app-card-skeleton type="product" />
+        }
+      </div>
+    } @else {
+      <!-- Products Content -->
+      @if (featuredProducts().length > 0) {
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12"
+        >
+          @for (product of featuredProducts(); track product.id) {
+            <app-product-card [product]="product" />
+          }
+        </div>
+      } @else {
+        <!-- Empty State -->
+        <div class="text-center py-12">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-24 w-24 mx-auto text-base-content/30 mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+            />
+          </svg>
+          <h3 class="text-2xl font-bold text-base-content mb-2">
+            No hay productos destacados
+          </h3>
+          <p class="text-base-content/70 mb-6">
+            Por el momento no tenemos productos destacados disponibles
+          </p>
+        </div>
+      }
+    }
+
+    <!-- CTA Button -->
+    <div class="text-center">
+      <button
+        (click)="navigateToProducts()"
+        class="btn btn-primary btn-lg gap-2 shadow-lg hover:shadow-xl transition-all"
+      >
+        Ver Todos los Productos
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 8l4 4m0 0l-4 4m4-4H3"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</section>

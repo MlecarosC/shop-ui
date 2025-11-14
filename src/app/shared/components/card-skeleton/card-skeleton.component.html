@@ -1,0 +1,92 @@
+<div class="card bg-base-100 shadow-xl animate-pulse">
+  <!-- Image Skeleton -->
+  <div
+    class="bg-base-300 w-full"
+    [style.height.px]="calculatedImageHeight"
+  ></div>
+
+  <!-- Content Skeleton -->
+  <div class="card-body p-4">
+    @if (type === 'product') {
+      <!-- Product Card Skeleton -->
+
+      <!-- Title -->
+      <div class="space-y-2 mb-3">
+        <div class="h-4 bg-base-300 rounded w-3/4"></div>
+        <div class="h-4 bg-base-300 rounded w-1/2"></div>
+      </div>
+
+      <!-- Category -->
+      <div class="h-3 bg-base-300 rounded w-1/4 mb-2"></div>
+
+      <!-- Rating -->
+      <div class="flex items-center gap-1 mb-3">
+        <div class="h-4 bg-base-300 rounded w-24"></div>
+      </div>
+
+      <!-- Price -->
+      <div class="flex items-center gap-2 mb-4">
+        <div class="h-6 bg-base-300 rounded w-20"></div>
+        <div class="h-4 bg-base-300 rounded w-16"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-between items-center">
+        <div class="h-8 bg-base-300 rounded w-24"></div>
+        <div class="h-8 bg-base-300 rounded w-28"></div>
+      </div>
+
+    } @else if (type === 'blog') {
+      <!-- Blog Card Skeleton -->
+
+      <!-- Title -->
+      <div class="space-y-2 mb-3">
+        <div class="h-5 bg-base-300 rounded w-full"></div>
+        <div class="h-5 bg-base-300 rounded w-2/3"></div>
+      </div>
+
+      <!-- Excerpt -->
+      <div class="space-y-2 mb-4">
+        <div class="h-3 bg-base-300 rounded w-full"></div>
+        <div class="h-3 bg-base-300 rounded w-full"></div>
+        <div class="h-3 bg-base-300 rounded w-3/4"></div>
+      </div>
+
+      <!-- Author & Date -->
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-full bg-base-300"></div>
+          <div class="h-3 bg-base-300 rounded w-20"></div>
+        </div>
+        <div class="h-3 bg-base-300 rounded w-24"></div>
+      </div>
+
+      <!-- Read More Button -->
+      <div class="flex justify-end">
+        <div class="h-8 bg-base-300 rounded w-24"></div>
+      </div>
+
+    } @else {
+      <!-- Default Card Skeleton -->
+
+      <!-- Title -->
+      <div class="space-y-3 mb-4">
+        <div class="h-4 bg-base-300 rounded w-3/4"></div>
+        <div class="h-4 bg-base-300 rounded w-1/2"></div>
+      </div>
+
+      <!-- Content Lines -->
+      <div class="space-y-2 mb-4">
+        <div class="h-3 bg-base-300 rounded w-full"></div>
+        <div class="h-3 bg-base-300 rounded w-full"></div>
+        <div class="h-3 bg-base-300 rounded w-2/3"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-between items-center">
+        <div class="h-8 bg-base-300 rounded w-20"></div>
+        <div class="h-8 bg-base-300 rounded w-24"></div>
+      </div>
+    }
+  </div>
+</div>

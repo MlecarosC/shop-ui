@@ -1,12 +1,30 @@
-@import "tailwindcss";
-@plugin "daisyui";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* Global Styles */
 :root {
   --navbar-height: 4rem;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Styles for Product Descriptions */
 .product-description {
-  color: hsl(var(--bc) / 0.8);
+  line-height: 1.75;
+  color: var(--bc, #1f2937);
 }
 
 .product-description h1,
@@ -15,21 +33,18 @@
 .product-description h4,
 .product-description h5,
 .product-description h6 {
-  color: hsl(var(--p));
+  color: var(--p, #570df8);
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 1rem;
 }
 
-.product-description h2 {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-}
-
-.product-description h3 {
-  font-size: 1.5rem;
-  line-height: 2rem;
-}
+.product-description h1 { font-size: 2rem; }
+.product-description h2 { font-size: 1.75rem; }
+.product-description h3 { font-size: 1.5rem; }
+.product-description h4 { font-size: 1.25rem; }
+.product-description h5 { font-size: 1.125rem; }
+.product-description h6 { font-size: 1rem; }
 
 .product-description p {
   margin-bottom: 1rem;
@@ -52,56 +67,69 @@
 
 .product-description li {
   margin-bottom: 0.5rem;
-  line-height: 1.75;
-}
-
-.product-description strong {
-  font-weight: 700;
-  color: hsl(var(--bc));
-}
-
-.product-description em {
-  font-style: italic;
 }
 
 .product-description a {
-  color: hsl(var(--p));
+  color: var(--p, #570df8);
   text-decoration: underline;
 }
 
 .product-description a:hover {
-  color: hsl(var(--pf));
+  color: var(--pf, #4506cb);
 }
 
 .product-description blockquote {
-  border-left: 4px solid hsl(var(--p));
+  border-left: 4px solid var(--p, #570df8);
   padding-left: 1rem;
-  margin: 1.5rem 0;
+  margin: 1rem 0;
   font-style: italic;
-  color: hsl(var(--bc) / 0.7);
+  color: var(--bc, #6b7280);
 }
 
 .product-description img {
-  border-radius: 0.5rem;
-  margin: 1.5rem 0;
   max-width: 100%;
   height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
 }
 
 .product-description table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1.5rem 0;
+  margin: 1rem 0;
 }
 
-.product-description th,
-.product-description td {
-  border: 1px solid hsl(var(--bc) / 0.2);
+.product-description table th,
+.product-description table td {
+  border: 1px solid var(--b3, #e5e7eb);
   padding: 0.75rem;
   text-align: left;
 }
 
-.product-description th {
-  background-color: hsl(var(--b2));
-  font-weight: 700;
+.product-description table th {
+  background-color: var(--b2, #f3f4f6);
+  font-weight: 600;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--b2, #f1f1f1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--p, #570df8);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pf, #4506cb);
 }

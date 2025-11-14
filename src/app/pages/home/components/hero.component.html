@@ -1,0 +1,151 @@
+<!-- Hero Section - Full viewport height -->
+<section
+  class="relative min-h-screen flex items-center justify-center overflow-hidden bg-base-300"
+>
+  <!-- Background Image -->
+  <div
+    class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+    style="background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&q=80');"
+  ></div>
+
+  <!-- Gradient Overlay -->
+  <div
+    class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"
+  ></div>
+
+  <!-- Hero Content -->
+  <div class="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-white">
+    <div class="max-w-3xl">
+      <!-- Main Heading -->
+      <h1
+        class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight animate-fade-in"
+      >
+        Descubre Productos de
+        <span class="text-primary">Calidad Excepcional</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-xl sm:text-2xl mb-8 text-gray-200 animate-fade-in-delay">
+        Encuentra todo lo que necesitas en un solo lugar. Ofrecemos los mejores
+        productos con precios competitivos y envío rápido.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 animate-fade-in-delay-2">
+        <button
+          (click)="navigateToProducts()"
+          class="btn btn-primary btn-lg gap-2 shadow-lg hover:shadow-xl transition-all"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+            />
+          </svg>
+          Ver Productos
+        </button>
+
+        <button
+          (click)="navigateToProducts()"
+          class="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-base-content hover:border-white shadow-lg transition-all"
+        >
+          Explorar Ofertas
+        </button>
+      </div>
+
+      <!-- Features -->
+      <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="flex items-center gap-3">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 text-primary flex-shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          <div>
+            <h3 class="font-semibold text-lg">Envío Gratis</h3>
+            <p class="text-sm text-gray-300">En compras mayores a $50</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 text-primary flex-shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
+          </svg>
+          <div>
+            <h3 class="font-semibold text-lg">Compra Segura</h3>
+            <p class="text-sm text-gray-300">Protección garantizada</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 text-primary flex-shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+            />
+          </svg>
+          <div>
+            <h3 class="font-semibold text-lg">Devoluciones</h3>
+            <p class="text-sm text-gray-300">30 días sin preguntas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll Down Indicator -->
+  <div
+    class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-8 w-8 text-white opacity-75"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M19 14l-7 7m0 0l-7-7m7 7V3"
+      />
+    </svg>
+  </div>
+</section>
