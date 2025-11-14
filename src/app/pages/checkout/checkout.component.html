@@ -1,0 +1,388 @@
+<!-- Checkout Page Container -->
+<div class="container mx-auto px-4 py-8">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold text-base-content mb-2">Checkout</h1>
+    <p class="text-base-content/70">Completa tu información para finalizar la compra</p>
+  </div>
+
+  <!-- Checkout Form -->
+  @if (checkoutForm) {
+    <form [formGroup]="checkoutForm" (ngSubmit)="processOrder()">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column - Billing Information -->
+        <div class="lg:col-span-2 space-y-8">
+          <!-- Personal Information Section -->
+          <div class="card bg-base-100 shadow-lg">
+            <div class="card-body">
+              <h2 class="card-title text-2xl mb-4">Información Personal</h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- First Name -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-medium">Nombre <span class="text-error">*</span></span>
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="firstName"
+                    class="input input-bordered"
+                    [class.input-error]="hasError('firstName')"
+                    placeholder="Juan"
+                  />
+                  @if (hasError('firstName')) {
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {{ getErrorMessage('firstName', 'Nombre') }}
+                      </span>
+                    </label>
+                  }
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-medium">Apellido <span class="text-error">*</span></span>
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="lastName"
+                    class="input input-bordered"
+                    [class.input-error]="hasError('lastName')"
+                    placeholder="Pérez"
+                  />
+                  @if (hasError('lastName')) {
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {{ getErrorMessage('lastName', 'Apellido') }}
+                      </span>
+                    </label>
+                  }
+                </div>
+
+                <!-- Email -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-medium">Email <span class="text-error">*</span></span>
+                  </label>
+                  <input
+                    type="email"
+                    formControlName="email"
+                    class="input input-bordered"
+                    [class.input-error]="hasError('email')"
+                    placeholder="juan@ejemplo.com"
+                  />
+                  @if (hasError('email')) {
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {{ getErrorMessage('email', 'Email') }}
+                      </span>
+                    </label>
+                  }
+                </div>
+
+                <!-- Phone -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-medium">Teléfono <span class="text-error">*</span></span>
+                  </label>
+                  <input
+                    type="tel"
+                    formControlName="phone"
+                    class="input input-bordered"
+                    [class.input-error]="hasError('phone')"
+                    placeholder="+56912345678"
+                  />
+                  @if (hasError('phone')) {
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {{ getErrorMessage('phone', 'Teléfono') }}
+                      </span>
+                    </label>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping Address Section -->
+          <div class="card bg-base-100 shadow-lg">
+            <div class="card-body">
+              <h2 class="card-title text-2xl mb-4">Dirección de Envío</h2>
+
+              <div class="grid grid-cols-1 gap-4">
+                <!-- Address Line 1 -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-medium">Dirección <span class="text-error">*</span></span>
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="address_1"
+                    class="input input-bordered"
+                    [class.input-error]="hasError('address_1')"
+                    placeholder="Av. Providencia 123"
+                  />
+                  @if (hasError('address_1')) {
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {{ getErrorMessage('address_1', 'Dirección') }}
+                      </span>
+                    </label>
+                  }
+                </div>
+
+                <!-- Address Line 2 -->
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-medium">Dirección 2 (opcional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="address_2"
+                    class="input input-bordered"
+                    placeholder="Depto. 456"
+                  />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- City -->
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text font-medium">Ciudad <span class="text-error">*</span></span>
+                    </label>
+                    <input
+                      type="text"
+                      formControlName="city"
+                      class="input input-bordered"
+                      [class.input-error]="hasError('city')"
+                      placeholder="Santiago"
+                    />
+                    @if (hasError('city')) {
+                      <label class="label">
+                        <span class="label-text-alt text-error">
+                          {{ getErrorMessage('city', 'Ciudad') }}
+                        </span>
+                      </label>
+                    }
+                  </div>
+
+                  <!-- State/Region -->
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text font-medium">Región/Estado <span class="text-error">*</span></span>
+                    </label>
+                    <input
+                      type="text"
+                      formControlName="state"
+                      class="input input-bordered"
+                      [class.input-error]="hasError('state')"
+                      placeholder="Región Metropolitana"
+                    />
+                    @if (hasError('state')) {
+                      <label class="label">
+                        <span class="label-text-alt text-error">
+                          {{ getErrorMessage('state', 'Región') }}
+                        </span>
+                      </label>
+                    }
+                  </div>
+
+                  <!-- Country -->
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text font-medium">País <span class="text-error">*</span></span>
+                    </label>
+                    <select
+                      formControlName="country"
+                      class="select select-bordered"
+                      [class.select-error]="hasError('country')"
+                    >
+                      @for (country of countries; track country.code) {
+                        <option [value]="country.code">{{ country.name }}</option>
+                      }
+                    </select>
+                    @if (hasError('country')) {
+                      <label class="label">
+                        <span class="label-text-alt text-error">
+                          {{ getErrorMessage('country', 'País') }}
+                        </span>
+                      </label>
+                    }
+                  </div>
+
+                  <!-- Postal Code -->
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text font-medium">Código Postal <span class="text-error">*</span></span>
+                    </label>
+                    <input
+                      type="text"
+                      formControlName="postcode"
+                      class="input input-bordered"
+                      [class.input-error]="hasError('postcode')"
+                      placeholder="7500000"
+                    />
+                    @if (hasError('postcode')) {
+                      <label class="label">
+                        <span class="label-text-alt text-error">
+                          {{ getErrorMessage('postcode', 'Código Postal') }}
+                        </span>
+                      </label>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Method Section -->
+          <div class="card bg-base-100 shadow-lg">
+            <div class="card-body">
+              <h2 class="card-title text-2xl mb-4">Método de Pago</h2>
+
+              <div class="space-y-3">
+                @for (method of paymentMethods; track method.id) {
+                  <div class="form-control">
+                    <label class="label cursor-pointer justify-start gap-4 p-4 border border-base-300 rounded-lg hover:bg-base-200 transition-colors"
+                      [class.border-primary]="checkoutForm.get('paymentMethod')?.value === method.id"
+                      [class.bg-base-200]="checkoutForm.get('paymentMethod')?.value === method.id">
+                      <input
+                        type="radio"
+                        formControlName="paymentMethod"
+                        [value]="method.id"
+                        class="radio radio-primary"
+                      />
+                      <div class="flex-1">
+                        <span class="label-text font-semibold text-base">{{ method.name }}</span>
+                        <p class="text-sm text-base-content/70 mt-1">{{ method.description }}</p>
+                      </div>
+                    </label>
+                  </div>
+                }
+              </div>
+
+              @if (hasError('paymentMethod')) {
+                <label class="label">
+                  <span class="label-text-alt text-error">
+                    {{ getErrorMessage('paymentMethod', 'Método de pago') }}
+                  </span>
+                </label>
+              }
+            </div>
+          </div>
+
+          <!-- Terms and Conditions -->
+          <div class="card bg-base-100 shadow-lg">
+            <div class="card-body">
+              <div class="form-control">
+                <label class="label cursor-pointer justify-start gap-4">
+                  <input
+                    type="checkbox"
+                    formControlName="termsAccepted"
+                    class="checkbox checkbox-primary"
+                    [class.checkbox-error]="hasError('termsAccepted')"
+                  />
+                  <span class="label-text">
+                    Acepto los <a href="/terms" target="_blank" class="link link-primary">términos y condiciones</a>
+                    <span class="text-error">*</span>
+                  </span>
+                </label>
+                @if (hasError('termsAccepted')) {
+                  <label class="label">
+                    <span class="label-text-alt text-error">
+                      Debes aceptar los términos y condiciones para continuar
+                    </span>
+                  </label>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Order Summary -->
+        <div class="lg:col-span-1">
+          <div class="card bg-base-100 shadow-lg sticky top-4">
+            <div class="card-body">
+              <h2 class="card-title text-2xl mb-4">Resumen del Pedido</h2>
+
+              <!-- Cart Items -->
+              <div class="space-y-4 mb-4">
+                @for (item of cartItems(); track item.item_key) {
+                  <div class="flex gap-3 pb-4 border-b border-base-300">
+                    <!-- Product Image -->
+                    @if (item.featured_image) {
+                      <img
+                        [src]="item.featured_image"
+                        [alt]="item.name"
+                        class="w-16 h-16 object-cover rounded"
+                        loading="lazy"
+                      />
+                    }
+
+                    <!-- Product Info -->
+                    <div class="flex-1">
+                      <h3 class="font-semibold text-sm">{{ item.name }}</h3>
+                      <p class="text-xs text-base-content/70">Cantidad: {{ item.quantity.value }}</p>
+                      <p class="text-sm font-bold text-primary mt-1">
+                        ${{ getItemTotal(item) }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Order Totals -->
+              <div class="space-y-2 pt-4 border-t border-base-300">
+                <div class="flex justify-between text-base-content/70">
+                  <span>Subtotal</span>
+                  <span>${{ formatPrice(subtotal()) }}</span>
+                </div>
+
+                <div class="flex justify-between text-base-content/70">
+                  <span>Envío</span>
+                  <span>Gratis</span>
+                </div>
+
+                <div class="divider my-2"></div>
+
+                <div class="flex justify-between text-xl font-bold">
+                  <span>Total</span>
+                  <span class="text-primary">${{ formatPrice(total()) }}</span>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg w-full mt-6"
+                [disabled]="isProcessing() || checkoutForm.invalid"
+              >
+                @if (isProcessing()) {
+                  <span class="loading loading-spinner loading-sm"></span>
+                  Procesando...
+                } @else {
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  Finalizar Compra
+                }
+              </button>
+
+              <!-- Security Info -->
+              <div class="alert alert-info mt-4">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <div class="text-xs">
+                  <p class="font-semibold">Compra segura</p>
+                  <p>Tu información está protegida</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  }
+</div>

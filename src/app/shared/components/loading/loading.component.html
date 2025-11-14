@@ -1,0 +1,29 @@
+@if (fullScreen) {
+  <!-- Full Screen Loading -->
+  <div class="fixed inset-0 bg-base-100/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="flex flex-col items-center gap-4">
+      <!-- Spinner -->
+      <span [class]="spinnerClasses"></span>
+
+      <!-- Optional Message -->
+      @if (message) {
+        <p class="text-base-content text-center animate-pulse">
+          {{ message }}
+        </p>
+      }
+    </div>
+  </div>
+} @else {
+  <!-- Inline Loading -->
+  <div class="flex flex-col items-center justify-center gap-4 py-8">
+    <!-- Spinner -->
+    <span [class]="spinnerClasses"></span>
+
+    <!-- Optional Message -->
+    @if (message) {
+      <p class="text-base-content text-center text-sm">
+        {{ message }}
+      </p>
+    }
+  </div>
+}

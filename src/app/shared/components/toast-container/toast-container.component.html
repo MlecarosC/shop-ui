@@ -1,0 +1,95 @@
+<!-- Toast Container - Fixed position in top-right corner -->
+<div class="toast toast-top toast-end z-50">
+  @for (toast of toasts(); track trackByToastId($index, toast)) {
+    <div
+      [class]="getAlertClasses(toast.type)"
+      [@slideIn]
+      role="alert"
+    >
+      <!-- Icon -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          [attr.d]="getIcon(toast.type)"
+        />
+      </svg>
+
+      <!-- Message -->
+      <div class="flex-1">
+        @if (toast.title) {
+          <h3 class="font-bold">{{ toast.title }}</h3>
+        }
+        <div class="text-sm">{{ toast.message }}</div>
+      </div>
+
+      <!-- Close Button -->
+      <button
+        class="btn btn-sm btn-ghost btn-circle"
+        (click)="close(toast)"
+        aria-label="Cerrar notificación"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  }
+</div>
+
+<!-- Inline animations using Tailwind classes -->
+<style>
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  .toast > * {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  /* Hover effect */
+  .toast > *:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s ease-in-out;
+  }
+
+  /* Ensure proper spacing between toasts */
+  .toast > * + * {
+    margin-top: 0.5rem;
+  }
+</style>

@@ -1,14 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Navbar } from './shared/components/navbar/navbar';
-import { Footer } from './shared/components/footer/footer';
-import { ToastContainer } from './shared/components/toastContainer/toastContainer';
+import { NavbarComponent, FooterComponent, ToastContainerComponent } from '@shared/components';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, Footer, ToastContainer],
-  templateUrl: './app.html',
+  standalone: true,
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, ToastContainerComponent],
+  templateUrl: './app.html'
 })
-export class App {
-  protected readonly title = signal('shop-ui');
-}
+export class App {}

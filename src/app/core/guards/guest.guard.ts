@@ -1,15 +1,36 @@
 import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
-import { AuthApiService } from '../services/auth-api.service';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '@core/services/auth.service';
 
-export const guestGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthApiService);
+/**
+ * Guest Guard - Protege rutas que solo deben ser accesibles por usuarios NO autenticados
+ *
+ * Si el usuario YA está autenticado:
+ * - Redirige al home
+ *
+ * Casos de uso:
+ * - Página de login (usuarios autenticados no necesitan login)
+ * - Página de registro (usuarios autenticados ya tienen cuenta)
+ * - Página de recuperación de contraseña
+ *
+ * Uso en rutas:
+ * ```typescript
+ * {
+ *   path: 'login',
+ *   component: LoginComponent,
+ *   canActivate: [guestGuard]
+ * }
+ * ```
+ */
+export const guestGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
   const router = inject(Router);
-  
-  if (!authService.getIsAuthenticatedSignal()()) {
+
+  // Si el usuario NO está autenticado, permitir acceso
+  if (!authService.isAuthenticated()) {
     return true;
   }
 
-  router.navigate(['/home']);
-  return false;
+  // Si el usuario YA está autenticado, redirigir al home
+  return router.createUrlTree(['/home']);
 };

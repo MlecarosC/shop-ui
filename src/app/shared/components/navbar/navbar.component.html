@@ -1,0 +1,121 @@
+<nav class="navbar bg-base-100 shadow-lg sticky top-0 z-50">
+  <div class="container mx-auto px-4">
+    <div class="flex-1">
+      <!-- Logo -->
+      <a routerLink="/" class="btn btn-ghost normal-case text-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-primary">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
+        </svg>
+        <span class="ml-2 font-bold">Shop</span>
+      </a>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <div class="hidden lg:flex flex-none gap-2">
+      <ul class="menu menu-horizontal px-1">
+        <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+        <li><a routerLink="/products" routerLinkActive="active">Productos</a></li>
+        <li><a routerLink="/blog" routerLinkActive="active">Blog</a></li>
+        <li><a routerLink="/about" routerLinkActive="active">Nosotros</a></li>
+        <li><a routerLink="/contact" routerLinkActive="active">Contacto</a></li>
+      </ul>
+
+      <!-- Cart Button -->
+      <div class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-ghost btn-circle">
+          <div class="indicator">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            @if (cartItemCount() > 0) {
+              <span class="badge badge-sm badge-primary indicator-item">{{ cartItemCount() }}</span>
+            }
+          </div>
+        </label>
+        <div tabindex="0" class="mt-3 z-[1] card card-compact dropdown-content w-52 bg-base-100 shadow">
+          <div class="card-body">
+            <span class="font-bold text-lg">{{ cartItemCount() }} Items</span>
+            <div class="card-actions">
+              <a routerLink="/cart" class="btn btn-primary btn-block">Ver Carrito</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Menu -->
+      @if (isAuthenticated()) {
+        <div class="dropdown dropdown-end">
+          <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+            <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
+              <span class="text-lg font-semibold">
+                {{ currentUser()?.first_name?.charAt(0) || currentUser()?.username?.charAt(0) || 'U' }}
+              </span>
+            </div>
+          </label>
+          <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+            <li class="menu-title">
+              <span>{{ currentUser()?.first_name || currentUser()?.username }}</span>
+            </li>
+            <li><a routerLink="/profile">Mi Perfil</a></li>
+            <li><a routerLink="/orders">Mis Órdenes</a></li>
+            <li><a (click)="logout()">Cerrar Sesión</a></li>
+          </ul>
+        </div>
+      } @else {
+        <div class="flex gap-2">
+          <a routerLink="/auth/login" class="btn btn-ghost">Login</a>
+          <a routerLink="/auth/register" class="btn btn-primary">Registrarse</a>
+        </div>
+      }
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <div class="flex lg:hidden">
+      <!-- Cart Icon for Mobile -->
+      <a routerLink="/cart" class="btn btn-ghost btn-circle">
+        <div class="indicator">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          @if (cartItemCount() > 0) {
+            <span class="badge badge-xs badge-primary indicator-item">{{ cartItemCount() }}</span>
+          }
+        </div>
+      </a>
+
+      <!-- Hamburger Button -->
+      <button class="btn btn-ghost btn-circle" (click)="toggleMobileMenu()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Dropdown -->
+  @if (isMobileMenuOpen()) {
+    <div class="lg:hidden bg-base-100 border-t border-base-300">
+      <ul class="menu menu-vertical px-4 py-2">
+        <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMobileMenu()">Home</a></li>
+        <li><a routerLink="/products" routerLinkActive="active" (click)="closeMobileMenu()">Productos</a></li>
+        <li><a routerLink="/blog" routerLinkActive="active" (click)="closeMobileMenu()">Blog</a></li>
+        <li><a routerLink="/about" routerLinkActive="active" (click)="closeMobileMenu()">Nosotros</a></li>
+        <li><a routerLink="/contact" routerLinkActive="active" (click)="closeMobileMenu()">Contacto</a></li>
+
+        <div class="divider"></div>
+
+        @if (isAuthenticated()) {
+          <li class="menu-title">
+            <span>{{ currentUser()?.first_name || currentUser()?.username }}</span>
+          </li>
+          <li><a routerLink="/profile" (click)="closeMobileMenu()">Mi Perfil</a></li>
+          <li><a routerLink="/orders" (click)="closeMobileMenu()">Mis Órdenes</a></li>
+          <li><a (click)="logout()">Cerrar Sesión</a></li>
+        } @else {
+          <li><a routerLink="/auth/login" (click)="closeMobileMenu()">Login</a></li>
+          <li><a routerLink="/auth/register" class="btn btn-primary" (click)="closeMobileMenu()">Registrarse</a></li>
+        }
+      </ul>
+    </div>
+  }
+</nav>

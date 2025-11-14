@@ -1,0 +1,75 @@
+<!-- Home Page - Main Container -->
+<div class="min-h-screen bg-base-100">
+  <!-- Hero Section -->
+  <app-hero />
+
+  <!-- Featured Products Section -->
+  <app-home-products />
+
+  <!-- Partners/Clients Logo Carousel -->
+  <section class="py-12 bg-base-200">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-8">
+        <h3 class="text-2xl font-bold text-base-content mb-2">
+          Confían en Nosotros
+        </h3>
+        <p class="text-base-content/70">
+          Marcas y clientes que nos respaldan
+        </p>
+      </div>
+      <app-logo-carousel
+        [logos]="partnerLogos"
+        [speed]="30"
+        [pauseOnHover]="true"
+      />
+    </div>
+  </section>
+
+  <!-- About Us Section -->
+  <app-home-about-us />
+
+  <!-- Blog Section -->
+  <app-home-blog />
+
+  <!-- Newsletter Section (Optional CTA) -->
+  <section class="py-16 bg-primary text-primary-content">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-4xl sm:text-5xl font-bold mb-4">
+          Suscríbete a Nuestro Newsletter
+        </h2>
+        <p class="text-xl mb-8 text-primary-content/90">
+          Recibe las mejores ofertas, novedades y contenido exclusivo
+          directamente en tu correo
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto">
+          <input
+            type="email"
+            placeholder="Tu correo electrónico"
+            class="input input-lg w-full sm:flex-1 bg-white text-base-content"
+          />
+          <button class="btn btn-lg btn-neutral">
+            Suscribirse
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 ml-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+          </button>
+        </div>
+        <p class="text-sm mt-4 text-primary-content/80">
+          No enviamos spam. Puedes cancelar tu suscripción en cualquier momento.
+        </p>
+      </div>
+    </div>
+  </section>
+</div>

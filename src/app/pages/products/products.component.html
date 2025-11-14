@@ -1,0 +1,156 @@
+<!-- Products Page Container -->
+<div class="container mx-auto px-4 py-8">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold text-base-content mb-2">Productos</h1>
+    <p class="text-base-content/70">Explora nuestro catálogo completo de productos</p>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+    <!-- Category Filter -->
+    <div class="form-control w-full sm:w-auto sm:min-w-[250px]">
+      <label class="label">
+        <span class="label-text font-medium">Filtrar por categoría</span>
+      </label>
+      <select
+        class="select select-bordered w-full"
+        [value]="selectedCategory() || ''"
+        (change)="onCategoryChange($event)"
+        [disabled]="isLoading()"
+      >
+        <option value="">Todas las categorías</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Results Count -->
+    @if (!isLoading() && total() > 0) {
+      <div class="text-base-content/70">
+        Mostrando {{ products().length }} de {{ total() }} productos
+      </div>
+    }
+  </div>
+
+  <!-- Loading State - Skeleton Cards -->
+  @if (isLoading()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (item of skeletonArray; track $index) {
+        <app-card-skeleton type="product" />
+      }
+    </div>
+  }
+
+  <!-- Products Grid -->
+  @if (!isLoading() && hasProducts()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (product of products(); track product.id) {
+        <app-product-card [product]="mapToProduct(product)" />
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && !hasProducts()) {
+    <div class="text-center py-16">
+      <div class="max-w-md mx-auto">
+        <!-- Icon -->
+        <svg
+          class="w-24 h-24 mx-auto mb-4 text-base-content/20"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+          />
+        </svg>
+
+        <!-- Message -->
+        <h3 class="text-2xl font-bold text-base-content mb-2">
+          No se encontraron productos
+        </h3>
+        <p class="text-base-content/70 mb-6">
+          @if (selectedCategory()) {
+            No hay productos disponibles en esta categoría. Intenta seleccionar otra categoría.
+          } @else {
+            No hay productos disponibles en este momento. Por favor, vuelve más tarde.
+          }
+        </p>
+
+        <!-- Clear Filter Button (if category is selected) -->
+        @if (selectedCategory()) {
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="selectedCategory.set(null); currentPage.set(1); loadProducts()"
+          >
+            Ver todos los productos
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Pagination Controls -->
+  @if (!isLoading() && hasProducts() && totalPages() > 1) {
+    <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <!-- Page Info -->
+      <div class="text-base-content/70 text-sm">
+        Página {{ currentPage() }} de {{ totalPages() }}
+      </div>
+
+      <!-- Pagination Buttons -->
+      <div class="join">
+        <button
+          type="button"
+          class="join-item btn btn-outline"
+          [disabled]="!hasPreviousPage() || isLoading()"
+          (click)="goToPreviousPage()"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Anterior
+        </button>
+
+        <button
+          type="button"
+          class="join-item btn btn-outline"
+          [disabled]="!hasNextPage() || isLoading()"
+          (click)="goToNextPage()"
+        >
+          Siguiente
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  }
+</div>

@@ -1,72 +1,112 @@
 import { Routes } from '@angular/router';
-import { guestGuard } from './core/guards/guest.guard';
+import { authGuard, guestGuard } from '@core/guards';
 
+/**
+ * Configuración de rutas de la aplicación con lazy loading
+ *
+ * Características:
+ * - Lazy loading para optimizar la carga inicial
+ * - Guards para proteger rutas (authGuard, guestGuard)
+ * - Redirecciones apropiadas
+ * - Ruta wildcard para 404
+ */
 export const routes: Routes = [
-{ 
-    path: '', 
-    redirectTo: '/home', 
-    pathMatch: 'full' 
+  // Redirección raíz a home
+  {
+    path: '',
+    redirectTo: '/home',
+    pathMatch: 'full'
   },
-  { 
-    path: 'home', 
-    loadComponent: () => import('./pages/home/home')
-      .then(m => m.Home)
+
+  // Home - Página principal
+  {
+    path: 'home',
+    loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
+    title: 'Inicio - Shop'
   },
+
+  // Products - Listado de productos
   {
     path: 'products',
-    loadComponent: () => import('./pages/products/products')
-      .then(m => m.Products)
+    loadComponent: () => import('./pages/products/products.component').then(m => m.ProductsComponent),
+    title: 'Productos - Shop'
   },
-  { 
-    path: 'products/:id', 
-    loadComponent: () => import('./pages/productDetail/productDetail')
-      .then(m => m.ProductDetail)
+
+  // Product Detail - Detalle de un producto
+  {
+    path: 'products/:id',
+    loadComponent: () => import('./pages/product-detail/product-detail.component').then(m => m.ProductDetailComponent),
+    title: 'Detalle del Producto - Shop'
   },
+
+  // Checkout - Proceso de compra (requiere autenticación)
+  {
+    path: 'checkout',
+    loadComponent: () => import('./pages/checkout/checkout.component').then(m => m.CheckoutComponent),
+    canActivate: [authGuard],
+    title: 'Finalizar Compra - Shop'
+  },
+
+  // Order Confirmation - Confirmación de pedido
+  {
+    path: 'order-confirmation/:orderId',
+    loadComponent: () => import('./pages/order-confirmation/order-confirmation.component').then(m => m.OrderConfirmationComponent),
+    title: 'Confirmación de Pedido - Shop'
+  },
+
+  // Blog - Listado de posts
+  {
+    path: 'blog',
+    loadComponent: () => import('./pages/blog/blog.component').then(m => m.BlogComponent),
+    title: 'Blog - Shop'
+  },
+
+  // Blog Detail - Detalle de un post
+  {
+    path: 'blog/:slug',
+    loadComponent: () => import('./pages/blog-detail/blog-detail.component').then(m => m.BlogDetailComponent),
+    title: 'Blog - Shop'
+  },
+
+  // About Us - Sobre nosotros
   {
     path: 'about-us',
-    loadComponent: () => import('./pages/aboutUs/aboutUs')
-      .then(m => m.AboutUs)
+    loadComponent: () => import('./pages/about-us/about-us.component').then(m => m.AboutUsComponent),
+    title: 'Sobre Nosotros - Shop'
   },
-    { 
-    path: 'blog', 
-    loadComponent: () => import('./pages/blog/blog')
-      .then(m => m.Blog)
-  },
-  { 
-    path: 'blog/:id', 
-    loadComponent: () => import('./pages/blogDetail/blogDetail')
-      .then(m => m.BlogDetail)
-  },
-  {
-    path: 'login',
-    canActivate: [guestGuard],
-    loadComponent: () => import('./pages/login/login')
-      .then(m => m.Login)
-  },
-  {
-    path: 'register',
-    canActivate: [guestGuard],
-    loadComponent: () => import('./pages/register/register')
-      .then(m => m.Register)
-  },
-  {
-    path: 'forgot-password',
-    canActivate: [guestGuard],
-    loadComponent: () => import('./pages/forgotPassword/forgotPassword')
-      .then(m => m.ForgotPassword)
-  },
+
+  // Contact - Contacto
   {
     path: 'contact',
-    loadComponent: () => import('./pages/contact/contact')
-      .then(m => m.Contact)
+    loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent),
+    title: 'Contacto - Shop'
   },
-    {
-    path: 'checkout',
-    loadComponent: () => import('./pages/checkout/checkout')
-      .then(m => m.Checkout)
+
+  // Authentication Routes - Solo para usuarios NO autenticados
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
+    canActivate: [guestGuard],
+    title: 'Iniciar Sesión - Shop'
   },
-  { 
-    path: '**', 
-    redirectTo: '/home' 
+
+  {
+    path: 'register',
+    loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent),
+    canActivate: [guestGuard],
+    title: 'Registrarse - Shop'
   },
+
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('./pages/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),
+    canActivate: [guestGuard],
+    title: 'Recuperar Contraseña - Shop'
+  },
+
+  // Wildcard - Redirige al home si la ruta no existe
+  {
+    path: '**',
+    redirectTo: '/home'
+  }
 ];
