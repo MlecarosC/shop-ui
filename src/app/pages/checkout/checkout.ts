@@ -26,6 +26,7 @@ export class Checkout implements OnInit {
 
   checkoutForm!: FormGroup;
   isProcessing = signal(false);
+  formValid = signal(false);
 
   cart = this.cartService.getCartSignal();
   currentUser = this.authService.getCurrentUserSignal();
@@ -35,7 +36,7 @@ export class Checkout implements OnInit {
   countries: Country[] = [];
 
   canProcessOrder = computed(() => {
-    return this.checkoutForm?.valid &&
+    return this.formValid() &&
            this.isAuthenticated() &&
            !this.isProcessing() &&
            (this.cart()?.items?.length || 0) > 0;
@@ -68,6 +69,14 @@ export class Checkout implements OnInit {
       state: ['', [Validators.required]],
       paymentMethod: ['', [Validators.required]]
     });
+
+    // Subscribe to form changes to update signal
+    this.checkoutForm.statusChanges.subscribe(() => {
+      this.formValid.set(this.checkoutForm.valid);
+    });
+
+    // Set initial value
+    this.formValid.set(this.checkoutForm.valid);
   }
 
 
